@@ -120,7 +120,7 @@
     return [...cfg.concepts, ...cfg.qa].find((s) => s.id === id);
   }
 
-  async function openSection(id, anchor) {
+  async function openSection(id, anchor, headingText) {
     const section = findSection(id);
     if (!section) return;
     currentSectionId = id;
@@ -157,9 +157,17 @@
         });
       });
       content.scrollTop = 0;
-      if (anchor) {
+      if (anchor || headingText) {
         setTimeout(() => {
-          const el = document.getElementById(anchor);
+          let el = anchor ? document.getElementById(anchor) : null;
+          if (!el && headingText) {
+            const norm = (s) => (s || '').normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/\s+/g, ' ').trim();
+            const target = norm(headingText);
+            const headings = content.querySelectorAll('h1, h2, h3, h4');
+            for (const h of headings) {
+              if (norm(h.textContent) === target) { el = h; break; }
+            }
+          }
           if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }, 50);
       }
@@ -228,7 +236,7 @@
   function jumpToResult(r) {
     searchResultsEl.hidden = true;
     searchInput.blur();
-    openSection(r.block.sectionId, r.block.anchor);
+    openSection(r.block.sectionId, r.block.anchor, r.block.heading);
   }
 
   const onSearch = debounce(() => {
