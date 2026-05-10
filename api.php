@@ -16,9 +16,22 @@
 
 declare(strict_types=1);
 
+// ---- load .env (if present) ----
+$_ENV_FILE = __DIR__ . '/.env';
+if (is_file($_ENV_FILE)) {
+    foreach (file($_ENV_FILE, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) as $_line) {
+        if ($_line === '' || $_line[0] === '#') continue;
+        [$_k, $_v] = array_pad(explode('=', $_line, 2), 2, '');
+        $_ENV[trim($_k)] = trim($_v);
+    }
+}
+
 // ---- config ----
-$USERNAME = 'abdohero';
-$PASSWORD = 'ABDOwahna135795';
+$USERNAME = $_ENV['APP_USERNAME'] ?? 'abdohero';
+$PASSWORD = $_ENV['APP_PASSWORD'] ?? 'ABDOwahna135795';
+$GROQ_API_KEY  = $_ENV['GROQ_API_KEY']  ?? '';
+$GROQ_ENDPOINT = $_ENV['GROQ_ENDPOINT'] ?? 'https://api.groq.com/openai/v1/chat/completions';
+$GROQ_MODEL    = $_ENV['GROQ_MODEL']    ?? 'meta-llama/llama-4-scout-17b-16e-instruct';
 
 $DATA_DIR  = __DIR__ . '/data';
 $DATA_FILE = $DATA_DIR . '/chat.json';
@@ -288,6 +301,59 @@ switch ($action) {
             return true;
         });
         jexit($state);
+    }
+
+    case 'chat': {
+        require_auth();
+        if ($method !== 'POST') jexit(['error' => 'method'], 405);
+        if ($GROQ_API_KEY === '') jexit(['error' => 'Groq API key not configured on server'], 500);
+
+        $b        = read_body();
+        $messages = $b['messages'] ?? null;
+        $model    = (string)($b['model'] ?? $GROQ_MODEL);
+        $temp     = (float)($b['temperature'] ?? 0.4);
+        $maxTok   = (int)($b['max_tokens'] ?? 1024);
+
+        if (!is_array($messages) || count($messages) === 0) {
+            jexit(['error' => 'messages array required'], 400);
+        }
+
+        // Proxy to Groq — key stays server-side
+        $payload = json_encode([
+            'model'       => $model,
+            'messages'    => $messages,
+            'temperature' => $temp,
+            'max_tokens'  => $maxTok,
+            'stream'      => false,
+        ], JSON_UNESCAPED_UNICODE);
+
+        $ctx = stream_context_create([
+            'http' => [
+                'method'  => 'POST',
+                'header'  => implode("\r\n", [
+                    'Content-Type: application/json',
+                    'Authorization: Bearer ' . $GROQ_API_KEY,
+                ]),
+                'content'         => $payload,
+                'ignore_errors'   => true,
+                'timeout'         => 60,
+            ],
+        ]);
+
+        $raw  = @file_get_contents($GROQ_ENDPOINT, false, $ctx);
+        // Relay Groq's HTTP status
+        $httpStatus = 200;
+        foreach ($http_response_header ?? [] as $h) {
+            if (preg_match('#^HTTP/\S+\s+(\d+)#', $h, $m)) {
+                $httpStatus = (int)$m[1];
+            }
+        }
+        if ($raw === false) {
+            jexit(['error' => 'Failed to reach Groq endpoint'], 502);
+        }
+        http_response_code($httpStatus);
+        echo $raw;
+        exit;
     }
 
     default:

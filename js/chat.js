@@ -235,18 +235,16 @@
         ...this.active().messages.map(({ role, content }) => ({ role, content })),
       ];
 
-      const res = await fetch(cfg.endpoint, {
+      // Call via server-side proxy so the API key is never exposed in the browser.
+      const res = await fetch('api.php?action=chat', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: 'Bearer ' + cfg.apiKey,
-        },
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           model: cfg.model,
           messages,
           temperature: 0.4,
           max_tokens: 1024,
-          stream: false,
         }),
       });
       if (!res.ok) {
