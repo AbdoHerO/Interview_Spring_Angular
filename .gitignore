@@ -1,0 +1,18 @@
+# Secrets — never commit
+.env
+
+# PHP session / lock files
+data/chat.lock
+data/sessions/
+
+# Local data (regenerated at runtime)
+data/chat.json
+data/*.tmp
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+*.swp
+*.swo
