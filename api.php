@@ -303,6 +303,25 @@ switch ($action) {
         jexit($state);
     }
 
+    case 'debug': {
+        require_auth();
+        $keySet    = $GROQ_API_KEY !== '';
+        $keyPreview = $keySet
+            ? substr($GROQ_API_KEY, 0, 8) . '...' . substr($GROQ_API_KEY, -4)
+            : '(not set)';
+        $envExists = is_file(__DIR__ . '/.env');
+        $curlOk    = function_exists('curl_init');
+        $furlOk    = (bool) ini_get('allow_url_fopen');
+        jexit([
+            'env_file_found'   => $envExists,
+            'groq_key_set'     => $keySet,
+            'groq_key_preview' => $keyPreview,
+            'curl_available'   => $curlOk,
+            'allow_url_fopen'  => $furlOk,
+            'php_version'      => PHP_VERSION,
+        ]);
+    }
+
     case 'chat': {
         require_auth();
         if ($method !== 'POST') jexit(['error' => 'method'], 405);
@@ -318,7 +337,6 @@ switch ($action) {
             jexit(['error' => 'messages array required'], 400);
         }
 
-        // Proxy to Groq — key stays server-side
         $payload = json_encode([
             'model'       => $model,
             'messages'    => $messages,
@@ -327,30 +345,48 @@ switch ($action) {
             'stream'      => false,
         ], JSON_UNESCAPED_UNICODE);
 
-        $ctx = stream_context_create([
-            'http' => [
-                'method'  => 'POST',
-                'header'  => implode("\r\n", [
+        // Use cURL (preferred on shared hosting); fall back to file_get_contents
+        if (function_exists('curl_init')) {
+            $ch = curl_init($GROQ_ENDPOINT);
+            curl_setopt_array($ch, [
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_POST           => true,
+                CURLOPT_POSTFIELDS     => $payload,
+                CURLOPT_TIMEOUT        => 60,
+                CURLOPT_HTTPHEADER     => [
                     'Content-Type: application/json',
                     'Authorization: Bearer ' . $GROQ_API_KEY,
-                ]),
-                'content'         => $payload,
-                'ignore_errors'   => true,
-                'timeout'         => 60,
-            ],
-        ]);
-
-        $raw  = @file_get_contents($GROQ_ENDPOINT, false, $ctx);
-        // Relay Groq's HTTP status
-        $httpStatus = 200;
-        foreach ($http_response_header ?? [] as $h) {
-            if (preg_match('#^HTTP/\S+\s+(\d+)#', $h, $m)) {
-                $httpStatus = (int)$m[1];
+                ],
+            ]);
+            $raw        = curl_exec($ch);
+            $httpStatus = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $curlErr    = curl_error($ch);
+            curl_close($ch);
+            if ($raw === false || $curlErr !== '') {
+                jexit(['error' => 'cURL error: ' . $curlErr], 502);
+            }
+        } else {
+            $ctx = stream_context_create([
+                'http' => [
+                    'method'        => 'POST',
+                    'header'        => "Content-Type: application/json\r\nAuthorization: Bearer " . $GROQ_API_KEY,
+                    'content'       => $payload,
+                    'ignore_errors' => true,
+                    'timeout'       => 60,
+                ],
+            ]);
+            $raw        = @file_get_contents($GROQ_ENDPOINT, false, $ctx);
+            $httpStatus = 200;
+            foreach ($http_response_header ?? [] as $h) {
+                if (preg_match('#^HTTP/\S+\s+(\d+)#', $h, $m)) {
+                    $httpStatus = (int)$m[1];
+                }
+            }
+            if ($raw === false) {
+                jexit(['error' => 'Failed to reach Groq endpoint (allow_url_fopen may be disabled and cURL is unavailable)'], 502);
             }
         }
-        if ($raw === false) {
-            jexit(['error' => 'Failed to reach Groq endpoint'], 502);
-        }
+
         http_response_code($httpStatus);
         echo $raw;
         exit;
