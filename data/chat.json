@@ -1,5 +1,5 @@
 {
-    "version": 13,
+    "version": 17,
     "activeId": "c_moz5t7zj4va2",
     "conversations": [
         {
@@ -26,6 +26,26 @@
                     "role": "assistant",
                     "content": "**Flutter** is an open-source, cross-platform mobile app development framework created by Google. It allows developers to build natively compiled applications for:\n\n* **Mobile**: Android and iOS\n* **Web**: Web applications\n* **Desktop**: Windows, macOS, and Linux\n\n**Key Features:**\n\n* **Cross-platform**: Write once, run everywhere\n* **Fast development**: Hot reload for rapid iteration\n* **Rich set of widgets**: Material Design and Cupertino (iOS) widgets\n* **High-performance**: Compiled to native code\n\n**When to use Flutter:**\n\n* **Cross-platform apps**: When you want to deploy on multiple platforms\n* **Rapid prototyping**: When you need to quickly test and validate an idea\n* **Custom UI**: When you want to create a unique and customized user interface\n\n**Example Code:**\n```dart\nimport 'package:flutter\/material.dart';\n\nvoid main() {\n  runApp(const MyApp());\n}\n\nclass MyApp extends StatelessWidget {\n  const MyApp({Key? key}) : super(key: key);\n\n  @override\n  Widget build(BuildContext context) {\n    return MaterialApp(\n      title: 'Flutter Demo',\n      theme: ThemeData(\n        primarySwatch: Colors.blue,\n      ),\n      home: const MyHomePage(),\n    );\n  }\n}\n\nclass MyHomePage extends StatelessWidget {\n  const MyHomePage({Key? key}) : super(key: key);\n\n  @override\n  Widget build(BuildContext context) {\n    return Scaffold(\n      appBar: AppBar(\n        title: const Text('Flutter Demo'),\n      ),\n      body: const Center(\n        child: Text('Hello, World!'),\n      ),\n    );\n  }\n}\n```",
                     "ts": 1778380488096
+                },
+                {
+                    "role": "user",
+                    "content": "hello",
+                    "ts": 1778381627119
+                },
+                {
+                    "role": "assistant",
+                    "content": "Hello! How can I assist you today?",
+                    "ts": 1778381627642
+                },
+                {
+                    "role": "user",
+                    "content": "hi",
+                    "ts": 1778381910518
+                },
+                {
+                    "role": "assistant",
+                    "content": "Hi! What's on your mind? Need help with something?",
+                    "ts": 1778381911100
                 }
             ]
         }
