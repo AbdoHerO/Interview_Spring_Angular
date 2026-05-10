@@ -21,6 +21,10 @@
       .filter((w) => w && !STOPWORDS.has(w) && w.length > 1);
   }
 
+  function stripInlineMd(s) {
+    return (s || '').replace(/\*\*|__|\*(?!\*)|_(?!_)|`/g, '').trim();
+  }
+
   function slugify(s) {
     return (s || '')
       .toLowerCase()
@@ -66,14 +70,15 @@
           const text = (b.heading + '\n' + b.body.join('\n')).trim();
           if (!text) continue;
           const anchor = b.heading ? slugify(b.heading) : '';
+          const cleanHeading = stripInlineMd(b.heading || sec.title);
           Index.blocks.push({
             sectionId: sec.id,
             sectionTitle: sec.title,
             group: sec.group,
-            heading: b.heading || sec.title,
+            heading: cleanHeading,
             anchor,
             text,
-            headingTerms: tokenize(b.heading || sec.title),
+            headingTerms: tokenize(cleanHeading),
             bodyTerms: tokenize(b.body.join(' ')),
             sectionTerms: tokenize(sec.title),
           });

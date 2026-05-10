@@ -161,7 +161,7 @@
         setTimeout(() => {
           let el = anchor ? document.getElementById(anchor) : null;
           if (!el && headingText) {
-            const norm = (s) => (s || '').normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/\s+/g, ' ').trim();
+            const norm = (s) => (s || '').replace(/\*\*|__|\*|_|`/g, '').normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/\s+/g, ' ').trim();
             const target = norm(headingText);
             const headings = content.querySelectorAll('h1, h2, h3, h4');
             for (const h of headings) {
