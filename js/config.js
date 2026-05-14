@@ -60,6 +60,22 @@ window.APP_CONFIG = {
         description: 'Useful Spring ecosystem questions.',
       },
     ],
+    tests: [
+      {
+        id: 'java-test',
+        title: 'Java Mock Test',
+        type: 'quiz',
+        path: 'tests/java.json',
+        description: '30 questions: MCQ, true/false and open. Get scored at the end.',
+      },
+      {
+        id: 'spring-boot-test',
+        title: 'Spring Boot Mock Test',
+        type: 'quiz',
+        path: 'tests/spring-boot.json',
+        description: '30 questions covering Spring Boot, Security, JPA, and microservices.',
+      },
+    ],
   },
 
   groq: {
@@ -70,7 +86,7 @@ window.APP_CONFIG = {
     // (only if the user hadn't customised it themselves).
     promptVersion: 2,
     defaultSystemPrompt: [
-      'In French: You are a concise technical interview coach.',
+      'In French: You are a concise technical interview coach specially in Spring Boot and Java and Angular.',
       'LANGUAGE RULE (highest priority): Always reply in the SAME language as the user\'s most recent message.',
       '  - If the user writes in French → answer in French.',
       '  - If the user writes in English → answer in English.',

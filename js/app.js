@@ -8,6 +8,7 @@
   const app = $('#app');
   const navConcepts = $('#nav-concepts');
   const navQA = $('#nav-qa');
+  const navTests = $('#nav-tests');
   const content = $('#content');
   const sectionLabel = $('#current-section-label');
   const quickGrid = $('#quick-grid');
@@ -81,16 +82,19 @@
     const cfg = window.APP_CONFIG.sections;
     navConcepts.innerHTML = '';
     navQA.innerHTML = '';
+    if (navTests) navTests.innerHTML = '';
 
     cfg.concepts.forEach((s) => navConcepts.appendChild(navItem(s)));
     cfg.qa.forEach((s) => navQA.appendChild(navItem(s)));
+    (cfg.tests || []).forEach((s) => navTests && navTests.appendChild(navItem(s)));
 
     quickGrid.innerHTML = '';
-    [...cfg.concepts, ...cfg.qa].forEach((s) => {
+    [...cfg.concepts, ...cfg.qa, ...(cfg.tests || [])].forEach((s) => {
       const card = document.createElement('div');
       card.className = 'quick-card';
+      const tag = cfg.concepts.includes(s) ? 'Concept' : (cfg.qa.includes(s) ? 'Q & A' : 'Test');
       card.innerHTML = `
-        <div class="qc-tag">${cfg.concepts.includes(s) ? 'Concept' : 'Q & A'}</div>
+        <div class="qc-tag">${tag}</div>
         <h3>${escapeHtml(s.title)}</h3>
         <p>${escapeHtml(s.description || '')}</p>
       `;
@@ -117,7 +121,7 @@
 
   function findSection(id) {
     const cfg = window.APP_CONFIG.sections;
-    return [...cfg.concepts, ...cfg.qa].find((s) => s.id === id);
+    return [...cfg.concepts, ...cfg.qa, ...(cfg.tests || [])].find((s) => s.id === id);
   }
 
   async function openSection(id, anchor, headingText) {
@@ -135,6 +139,15 @@
           <embed class="pdf-viewer" src="${section.path}#view=FitH" type="application/pdf" />
           <p class="muted small">Can't see the PDF? <a href="${section.path}" target="_blank" rel="noopener">Open in new tab</a>.</p>
         </div>`;
+      return;
+    }
+
+    if (section.type === 'quiz') {
+      if (window.Quiz) {
+        await window.Quiz.open(section, content);
+      } else {
+        content.innerHTML = `<div class="markdown"><p class="muted">Quiz module not loaded.</p></div>`;
+      }
       return;
     }
 

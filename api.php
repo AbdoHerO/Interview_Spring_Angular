@@ -392,6 +392,77 @@ switch ($action) {
         exit;
     }
 
+    case 'grade-open': {
+        require_auth();
+        if ($method !== 'POST') jexit(['error' => 'method'], 405);
+        if ($GROQ_API_KEY === '') jexit(['error' => 'Groq API key not configured on server'], 500);
+
+        $b           = read_body();
+        $question    = (string)($b['question']    ?? '');
+        $modelAns    = (string)($b['modelAnswer'] ?? '');
+        $userAns     = (string)($b['userAnswer']  ?? '');
+        $keyPoints   = $b['keyPoints'] ?? [];
+        if ($question === '' || $userAns === '') {
+            jexit(['error' => 'question and userAnswer required'], 400);
+        }
+
+        $kpText = is_array($keyPoints) && count($keyPoints) > 0
+            ? "Key points the answer should ideally cover:\n- " . implode("\n- ", array_map('strval', $keyPoints))
+            : '';
+
+        $sys = "You are a strict but fair technical interview grader. "
+             . "Compare a candidate's answer to a model answer and key points. "
+             . "Reply ONLY with a compact JSON object: {\"score\": 0..1, \"comment\": \"one short sentence\"}. "
+             . "Score 1.0 = excellent, 0.7+ = pass, 0.4 = partial, 0 = wrong. "
+             . "Reply in the SAME language as the candidate's answer.";
+
+        $usr = "Question:\n$question\n\nModel answer:\n$modelAns\n\n$kpText\n\nCandidate's answer:\n$userAns\n\nReturn JSON only.";
+
+        $payload = json_encode([
+            'model'       => $GROQ_MODEL,
+            'messages'    => [
+                ['role' => 'system', 'content' => $sys],
+                ['role' => 'user',   'content' => $usr],
+            ],
+            'temperature' => 0.1,
+            'max_tokens'  => 200,
+            'stream'      => false,
+        ], JSON_UNESCAPED_UNICODE);
+
+        $raw = false;
+        if (function_exists('curl_init')) {
+            $ch = curl_init($GROQ_ENDPOINT);
+            curl_setopt_array($ch, [
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_POST           => true,
+                CURLOPT_POSTFIELDS     => $payload,
+                CURLOPT_TIMEOUT        => 60,
+                CURLOPT_HTTPHEADER     => [
+                    'Content-Type: application/json',
+                    'Authorization: Bearer ' . $GROQ_API_KEY,
+                ],
+            ]);
+            $raw = curl_exec($ch);
+            curl_close($ch);
+        }
+        if ($raw === false) jexit(['error' => 'Failed to reach Groq endpoint'], 502);
+
+        $data = json_decode($raw, true);
+        $reply = $data['choices'][0]['message']['content'] ?? '';
+        // Extract first JSON object found in the reply
+        $score = null; $comment = '';
+        if (preg_match('/\{.*\}/s', $reply, $m)) {
+            $j = json_decode($m[0], true);
+            if (is_array($j)) {
+                if (isset($j['score']))   $score   = (float)$j['score'];
+                if (isset($j['comment'])) $comment = (string)$j['comment'];
+            }
+        }
+        if ($score === null) jexit(['error' => 'AI returned unparseable response', 'raw' => $reply], 502);
+        $score = max(0.0, min(1.0, $score));
+        jexit(['score' => $score, 'comment' => $comment]);
+    }
+
     default:
         jexit(['error' => 'unknown action'], 404);
 }

@@ -1,0 +1,264 @@
+{
+  "id": "spring-boot-test",
+  "title": "Spring Boot — Mock Test",
+  "description": "Test your Spring Boot, Spring Security, JPA and microservice knowledge. Mix of MCQ, true/false and open questions.",
+  "passingScore": 60,
+  "questions": [
+    {
+      "id": "q1",
+      "type": "mcq",
+      "question": "Which annotation marks the main class of a Spring Boot application?",
+      "options": ["@Configuration", "@Component", "@SpringBootApplication", "@EnableAutoConfiguration"],
+      "answer": 2,
+      "explanation": "`@SpringBootApplication` is a meta-annotation combining `@Configuration`, `@EnableAutoConfiguration`, and `@ComponentScan`."
+    },
+    {
+      "id": "q2",
+      "type": "mcq",
+      "question": "What does `spring-boot-starter-web` include by default?",
+      "options": [
+        "Only the Spring MVC dependency",
+        "Spring MVC, Tomcat, Jackson, and validation",
+        "Spring WebFlux and Netty",
+        "Only an HTTP client"
+      ],
+      "answer": 1,
+      "explanation": "It bundles MVC, embedded Tomcat, Jackson for JSON, and Bean Validation."
+    },
+    {
+      "id": "q3",
+      "type": "truefalse",
+      "question": "`@RestController` is equivalent to `@Controller + @ResponseBody`.",
+      "answer": true,
+      "explanation": "`@RestController` automatically applies `@ResponseBody` to every handler method."
+    },
+    {
+      "id": "q4",
+      "type": "mcq",
+      "question": "Which annotation is used to inject a property value from `application.properties`?",
+      "options": ["@Inject", "@Value", "@Autowired", "@Property"],
+      "answer": 1,
+      "explanation": "`@Value(\"${my.prop}\")` injects the property value."
+    },
+    {
+      "id": "q5",
+      "type": "mcq",
+      "question": "What is the role of `@SpringBootApplication`'s `@EnableAutoConfiguration`?",
+      "options": [
+        "It scans components in the package",
+        "It triggers configuration based on classpath dependencies",
+        "It enables JPA repositories",
+        "It declares the main method"
+      ],
+      "answer": 1,
+      "explanation": "Auto-configuration inspects the classpath and beans to wire up sensible defaults."
+    },
+    {
+      "id": "q6",
+      "type": "multi",
+      "question": "Which of these are valid Spring bean scopes? (Select all)",
+      "options": ["singleton", "prototype", "request", "transient"],
+      "answer": [0, 1, 2],
+      "explanation": "Scopes: singleton (default), prototype, request, session, application, websocket. `transient` is not a Spring scope."
+    },
+    {
+      "id": "q7",
+      "type": "mcq",
+      "question": "Which annotation enables method-level security like `@PreAuthorize`?",
+      "options": ["@EnableWebSecurity", "@EnableGlobalMethodSecurity / @EnableMethodSecurity", "@Secured", "@EnableAuthorization"],
+      "answer": 1,
+      "explanation": "`@EnableMethodSecurity` (modern) or `@EnableGlobalMethodSecurity` (legacy) activates method-level annotations."
+    },
+    {
+      "id": "q8",
+      "type": "truefalse",
+      "question": "By default a Spring bean is scoped as `prototype`.",
+      "answer": false,
+      "explanation": "The default scope is `singleton` — one instance per Spring container."
+    },
+    {
+      "id": "q9",
+      "type": "mcq",
+      "question": "Which JPA annotation is used to mark a class as a database entity?",
+      "options": ["@Table", "@Entity", "@Document", "@Repository"],
+      "answer": 1,
+      "explanation": "`@Entity` declares the class as a JPA entity. `@Table` is optional for naming."
+    },
+    {
+      "id": "q10",
+      "type": "mcq",
+      "question": "What does `@Transactional` do at the service layer?",
+      "options": [
+        "Caches method results",
+        "Wraps the method in a database transaction; rolls back on RuntimeException by default",
+        "Makes the method asynchronous",
+        "Validates method parameters"
+      ],
+      "answer": 1,
+      "explanation": "Spring AOP wraps the call in a transaction. Checked exceptions don't trigger rollback unless configured."
+    },
+    {
+      "id": "q11",
+      "type": "multi",
+      "question": "Which HTTP methods are typically idempotent in REST? (Select all)",
+      "options": ["GET", "POST", "PUT", "DELETE"],
+      "answer": [0, 2, 3],
+      "explanation": "GET, PUT and DELETE are idempotent. POST is not (creates new resource each call)."
+    },
+    {
+      "id": "q12",
+      "type": "mcq",
+      "question": "Which actuator endpoint exposes application metrics?",
+      "options": ["/actuator/health", "/actuator/info", "/actuator/metrics", "/actuator/beans"],
+      "answer": 2,
+      "explanation": "`/actuator/metrics` lists available metrics; `/actuator/metrics/{name}` shows a specific metric."
+    },
+    {
+      "id": "q13",
+      "type": "truefalse",
+      "question": "Spring Boot DevTools enables automatic application restart on classpath changes.",
+      "answer": true,
+      "explanation": "DevTools watches classpath and triggers restart for code changes; LiveReload also refreshes the browser."
+    },
+    {
+      "id": "q14",
+      "type": "mcq",
+      "question": "Which annotation is used to validate a request body against bean validation constraints?",
+      "options": ["@Validated", "@Valid", "@RequestBody", "@Validate"],
+      "answer": 1,
+      "explanation": "`@Valid` on a `@RequestBody` parameter triggers JSR-380 validation."
+    },
+    {
+      "id": "q15",
+      "type": "open",
+      "question": "Explain the difference between `@Component`, `@Service`, `@Repository`, and `@Controller`.",
+      "modelAnswer": "All four are stereotype annotations that register the class as a Spring bean. They are functionally similar (all extend `@Component`), but each conveys intent: `@Service` marks business logic, `@Repository` marks data-access objects (and adds JPA exception translation), `@Controller` marks an MVC web controller, and `@Component` is the generic base. Using the right one improves readability and enables stereotype-specific behavior.",
+      "keyPoints": ["all are component beans", "@Repository adds exception translation", "@Controller for MVC handlers", "semantic / intent differences"]
+    },
+    {
+      "id": "q16",
+      "type": "mcq",
+      "question": "In Spring Security, what does the JWT filter typically extend?",
+      "options": ["Filter", "OncePerRequestFilter", "GenericFilterBean", "AuthenticationFilter"],
+      "answer": 1,
+      "explanation": "`OncePerRequestFilter` ensures the filter runs at most once per request, even on forwarded dispatches."
+    },
+    {
+      "id": "q17",
+      "type": "mcq",
+      "question": "Which annotation enables a Spring Boot test that loads only the web layer?",
+      "options": ["@SpringBootTest", "@WebMvcTest", "@DataJpaTest", "@AutoConfigureMockMvc"],
+      "answer": 1,
+      "explanation": "`@WebMvcTest` is a slice test loading controllers, filters and MockMvc — no service layer."
+    },
+    {
+      "id": "q18",
+      "type": "truefalse",
+      "question": "A Spring Boot starter is a curated set of dependencies you can add to a project.",
+      "answer": true,
+      "explanation": "Starters bundle compatible dependency versions (e.g. `spring-boot-starter-data-jpa`)."
+    },
+    {
+      "id": "q19",
+      "type": "mcq",
+      "question": "Which Spring Cloud component provides client-side load balancing and service discovery integration?",
+      "options": ["Eureka Server", "Spring Cloud Gateway", "Resilience4j", "Spring Cloud LoadBalancer"],
+      "answer": 3,
+      "explanation": "`Spring Cloud LoadBalancer` (replaces Ribbon) does client-side load balancing, often integrated with Eureka."
+    },
+    {
+      "id": "q20",
+      "type": "mcq",
+      "question": "What does `@RequestMapping(\"/users\")` on a class combined with `@GetMapping(\"/{id}\")` on a method produce?",
+      "options": ["GET /id", "GET /users", "GET /users/{id}", "GET /{id}/users"],
+      "answer": 2,
+      "explanation": "Class-level mapping is concatenated with method-level — yielding `/users/{id}`."
+    },
+    {
+      "id": "q21",
+      "type": "multi",
+      "question": "Which strategies are used for inter-service communication in microservices? (Select all)",
+      "options": ["REST over HTTP", "gRPC", "Message brokers (Kafka, RabbitMQ)", "Direct memory pointers"],
+      "answer": [0, 1, 2],
+      "explanation": "Microservices communicate via REST, gRPC, or async messaging. They never share memory."
+    },
+    {
+      "id": "q22",
+      "type": "mcq",
+      "question": "What does `@ConditionalOnProperty` do?",
+      "options": [
+        "Logs a property value at startup",
+        "Registers a bean only if a given property has a specific value",
+        "Validates a property at injection time",
+        "Encrypts a property"
+      ],
+      "answer": 1,
+      "explanation": "It's a key building block of Spring Boot auto-configuration."
+    },
+    {
+      "id": "q23",
+      "type": "truefalse",
+      "question": "`Spring Profiles` let you have different bean definitions per environment (dev, prod, etc.).",
+      "answer": true,
+      "explanation": "Activate via `spring.profiles.active=dev` or `@Profile(\"dev\")` on beans."
+    },
+    {
+      "id": "q24",
+      "type": "open",
+      "question": "What is dependency injection and how does Spring implement it?",
+      "modelAnswer": "Dependency Injection (DI) is a pattern where an object's dependencies are provided by an external container instead of being created inside the object itself, leading to looser coupling and easier testing. Spring's IoC container creates beans (via component scanning or `@Bean` methods) and injects them through constructors (preferred), setters, or fields using `@Autowired`. Constructor injection is recommended because it makes dependencies explicit, supports immutability, and enables easy testing without reflection.",
+      "keyPoints": ["loose coupling / inversion of control", "constructor / setter / field injection", "@Autowired and @Bean", "constructor injection preferred"]
+    },
+    {
+      "id": "q25",
+      "type": "mcq",
+      "question": "Which exception handling annotation provides global handlers across controllers?",
+      "options": ["@ExceptionHandler", "@ControllerAdvice", "@RestControllerAdvice", "Both B and C"],
+      "answer": 3,
+      "explanation": "`@ControllerAdvice` and `@RestControllerAdvice` both work globally; the latter implies `@ResponseBody`."
+    },
+    {
+      "id": "q26",
+      "type": "mcq",
+      "question": "In JPA, what is the difference between `findById()` and `getReferenceById()`?",
+      "options": [
+        "There is no difference",
+        "`findById` returns `Optional<T>` and hits the DB; `getReferenceById` returns a lazy proxy",
+        "`getReferenceById` always loads everything eagerly",
+        "`findById` is deprecated"
+      ],
+      "answer": 1,
+      "explanation": "`getReferenceById` returns a proxy without hitting the DB until a property is accessed."
+    },
+    {
+      "id": "q27",
+      "type": "truefalse",
+      "question": "`Spring Boot Actuator` requires changing the application code to add custom health indicators.",
+      "answer": true,
+      "explanation": "You implement `HealthIndicator` and register it as a bean for custom health logic."
+    },
+    {
+      "id": "q28",
+      "type": "mcq",
+      "question": "What is Spring's `RestTemplate` being replaced by in modern apps?",
+      "options": ["FeignClient", "HttpClient", "WebClient", "OkHttpClient"],
+      "answer": 2,
+      "explanation": "`WebClient` (from Spring WebFlux) is the modern non-blocking replacement; `RestTemplate` is in maintenance mode."
+    },
+    {
+      "id": "q29",
+      "type": "open",
+      "question": "Explain the role of an API Gateway in a microservices architecture.",
+      "modelAnswer": "An API Gateway is a single entry point that sits in front of microservices and handles cross-cutting concerns: routing requests to the right service, authentication/authorization, rate limiting, request/response transformation, load balancing, caching and aggregating responses from multiple services. It hides the internal topology from clients and lets services evolve independently. Spring Cloud Gateway is a common Java implementation.",
+      "keyPoints": ["single entry point", "routing", "cross-cutting concerns (auth, rate limit, logging)", "hides internal topology"]
+    },
+    {
+      "id": "q30",
+      "type": "mcq",
+      "question": "Which file is the Spring Boot configuration file that is loaded by default?",
+      "options": ["config.yml", "application.properties or application.yml", "spring.conf", "settings.json"],
+      "answer": 1,
+      "explanation": "Spring Boot loads `application.properties` or `application.yml` from classpath/config locations."
+    }
+  ]
+}

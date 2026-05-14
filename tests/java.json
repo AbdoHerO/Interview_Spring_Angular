@@ -1,0 +1,273 @@
+{
+  "id": "java-test",
+  "title": "Java 8 / 17 — Mock Test",
+  "description": "Test your Java knowledge with multiple-choice, true/false, and open questions extracted from the Java revision material.",
+  "passingScore": 60,
+  "questions": [
+    {
+      "id": "q1",
+      "type": "mcq",
+      "question": "Which Java version introduced Lambda expressions and the Stream API?",
+      "options": ["Java 7", "Java 8", "Java 11", "Java 17"],
+      "answer": 1,
+      "explanation": "Lambdas, Streams and the new Date/Time API were all introduced in Java 8."
+    },
+    {
+      "id": "q2",
+      "type": "mcq",
+      "question": "What is the correct functional interface used by `Stream.map()`?",
+      "options": ["Consumer<T>", "Predicate<T>", "Function<T,R>", "Supplier<T>"],
+      "answer": 2,
+      "explanation": "`map()` transforms each element, so it requires `Function<T,R>`."
+    },
+    {
+      "id": "q3",
+      "type": "mcq",
+      "question": "Which method correctly creates an immutable list in Java 9+?",
+      "options": ["Arrays.asList(1,2,3)", "new ArrayList<>(List.of(1,2,3))", "List.of(1,2,3)", "Collections.singletonList(1,2,3)"],
+      "answer": 2,
+      "explanation": "`List.of(...)` returns a true immutable list; `Arrays.asList` is fixed-size but mutable per element."
+    },
+    {
+      "id": "q4",
+      "type": "truefalse",
+      "question": "An `Optional<T>` can never contain a null value when created via `Optional.of(value)`.",
+      "answer": true,
+      "explanation": "`Optional.of(null)` throws NullPointerException. Use `Optional.ofNullable()` for a nullable value."
+    },
+    {
+      "id": "q5",
+      "type": "mcq",
+      "question": "Which collector groups stream elements into a Map by a classifier function?",
+      "options": ["Collectors.toMap", "Collectors.groupingBy", "Collectors.partitioningBy", "Collectors.mapping"],
+      "answer": 1,
+      "explanation": "`Collectors.groupingBy(classifier)` returns `Map<K, List<T>>`."
+    },
+    {
+      "id": "q6",
+      "type": "mcq",
+      "question": "What does `var` (Java 10+) do?",
+      "options": [
+        "Declares a dynamically-typed variable like JavaScript",
+        "Declares a local variable whose type is inferred at compile time",
+        "Declares a variable that can be reassigned to any type",
+        "Replaces the `final` keyword"
+      ],
+      "answer": 1,
+      "explanation": "`var` is local-variable type inference — type is fixed at compile time."
+    },
+    {
+      "id": "q7",
+      "type": "multi",
+      "question": "Which of the following are TRUE about `record` types (Java 16+)? (Select all that apply)",
+      "options": [
+        "They are implicitly final",
+        "They generate equals/hashCode/toString automatically",
+        "Their fields are mutable by default",
+        "They can extend another class"
+      ],
+      "answer": [0, 1],
+      "explanation": "Records are final, immutable, and cannot extend other classes (only implement interfaces)."
+    },
+    {
+      "id": "q8",
+      "type": "mcq",
+      "question": "Which Stream operation is a terminal operation?",
+      "options": ["filter", "map", "peek", "collect"],
+      "answer": 3,
+      "explanation": "`collect` triggers the pipeline. `filter`, `map` and `peek` are intermediate."
+    },
+    {
+      "id": "q9",
+      "type": "truefalse",
+      "question": "A sealed class (Java 17) restricts which other classes can extend it.",
+      "answer": true,
+      "explanation": "Sealed classes use the `permits` clause to control inheritance."
+    },
+    {
+      "id": "q10",
+      "type": "mcq",
+      "question": "What does `CompletableFuture.thenApply(fn)` do?",
+      "options": [
+        "Runs `fn` and ignores the result",
+        "Transforms the result asynchronously when it becomes available",
+        "Cancels the future",
+        "Blocks the current thread until completion"
+      ],
+      "answer": 1,
+      "explanation": "`thenApply` chains a synchronous transformation; `thenApplyAsync` runs it in a separate thread."
+    },
+    {
+      "id": "q11",
+      "type": "mcq",
+      "question": "Which keyword in a switch expression (Java 14+) returns a value from a block?",
+      "options": ["return", "yield", "break", "continue"],
+      "answer": 1,
+      "explanation": "`yield` returns a value from a switch expression block."
+    },
+    {
+      "id": "q12",
+      "type": "multi",
+      "question": "Which of these are valid functional interfaces in `java.util.function`? (Select all)",
+      "options": ["Predicate<T>", "BiFunction<T,U,R>", "Consumer<T>", "Iterable<T>"],
+      "answer": [0, 1, 2],
+      "explanation": "`Iterable` has multiple abstract methods (well, actually only one — `iterator()` — but it's not in `java.util.function`)."
+    },
+    {
+      "id": "q13",
+      "type": "truefalse",
+      "question": "`Stream.parallel()` always makes the pipeline faster.",
+      "answer": false,
+      "explanation": "Parallel streams add overhead. They help only on large data sets and CPU-bound ops with no shared state."
+    },
+    {
+      "id": "q14",
+      "type": "mcq",
+      "question": "What is the default method in an interface used for?",
+      "options": [
+        "To declare a static helper",
+        "To provide a default implementation that implementing classes inherit",
+        "To make a method final",
+        "To make an interface abstract"
+      ],
+      "answer": 1,
+      "explanation": "`default` methods (Java 8+) let interfaces evolve without breaking implementations."
+    },
+    {
+      "id": "q15",
+      "type": "mcq",
+      "question": "Which Date/Time API class represents a date WITHOUT time zone?",
+      "options": ["Date", "Calendar", "LocalDate", "ZonedDateTime"],
+      "answer": 2,
+      "explanation": "`java.time.LocalDate` represents a date with no time and no zone."
+    },
+    {
+      "id": "q16",
+      "type": "open",
+      "question": "Explain the difference between `==` and `.equals()` in Java when comparing two `String` objects.",
+      "modelAnswer": "`==` compares object references (memory addresses), while `.equals()` compares the string content. Two different String objects with the same characters can be `.equals()` true but `==` false. String literals are interned in the string pool, so `\"abc\" == \"abc\"` is true, but `new String(\"abc\") == \"abc\"` is false.",
+      "keyPoints": ["reference vs content", "string pool / interned strings", ".equals() compares characters"]
+    },
+    {
+      "id": "q17",
+      "type": "mcq",
+      "question": "Which collection guarantees insertion order AND uniqueness?",
+      "options": ["HashSet", "TreeSet", "LinkedHashSet", "ArrayList"],
+      "answer": 2,
+      "explanation": "`LinkedHashSet` preserves insertion order while enforcing uniqueness."
+    },
+    {
+      "id": "q18",
+      "type": "truefalse",
+      "question": "`String` is immutable in Java.",
+      "answer": true,
+      "explanation": "Once created, the contents of a String cannot be changed. Methods like `concat` return new String instances."
+    },
+    {
+      "id": "q19",
+      "type": "mcq",
+      "question": "Which stream collector returns the first element matching a predicate?",
+      "options": ["findFirst()", "findAny()", "filter()", "limit(1)"],
+      "answer": 0,
+      "explanation": "`findFirst()` returns an `Optional<T>` of the first matching element. `findAny()` may return any element (parallel-friendly)."
+    },
+    {
+      "id": "q20",
+      "type": "open",
+      "question": "What is the purpose of the `@FunctionalInterface` annotation?",
+      "modelAnswer": "It marks an interface as having exactly one abstract method, making it eligible for use with lambda expressions or method references. The annotation is optional — the compiler will still treat any single-abstract-method interface as functional — but the annotation makes the intent explicit and triggers a compile error if anyone adds a second abstract method.",
+      "keyPoints": ["single abstract method (SAM)", "lambda compatibility", "compiler enforcement"]
+    },
+    {
+      "id": "q21",
+      "type": "mcq",
+      "question": "Which exception is checked?",
+      "options": ["NullPointerException", "IllegalArgumentException", "IOException", "ArithmeticException"],
+      "answer": 2,
+      "explanation": "`IOException` is a checked exception (must be declared or caught). The others are unchecked (RuntimeException)."
+    },
+    {
+      "id": "q22",
+      "type": "multi",
+      "question": "Which of the following can a `record` do?",
+      "options": [
+        "Implement interfaces",
+        "Have a compact canonical constructor",
+        "Define static fields",
+        "Extend another class"
+      ],
+      "answer": [0, 1, 2],
+      "explanation": "Records can implement interfaces, define static members, and use compact constructors for validation. They cannot extend another class."
+    },
+    {
+      "id": "q23",
+      "type": "mcq",
+      "question": "What does `List.copyOf(list)` return?",
+      "options": [
+        "A mutable copy",
+        "A view of the original list",
+        "An unmodifiable shallow copy",
+        "A deep copy"
+      ],
+      "answer": 2,
+      "explanation": "`List.copyOf` returns an unmodifiable shallow copy. Modifying the source after copying does NOT affect the copy."
+    },
+    {
+      "id": "q24",
+      "type": "truefalse",
+      "question": "Text blocks (Java 15+) preserve all leading whitespace exactly as written in source.",
+      "answer": false,
+      "explanation": "The compiler removes incidental whitespace common to all lines (called 'incidental white space stripping')."
+    },
+    {
+      "id": "q25",
+      "type": "mcq",
+      "question": "Which is the correct way to create a thread-safe HashMap?",
+      "options": [
+        "new HashMap<>()",
+        "Collections.synchronizedMap(new HashMap<>())",
+        "new ConcurrentHashMap<>()",
+        "Both B and C"
+      ],
+      "answer": 3,
+      "explanation": "Both work, but `ConcurrentHashMap` offers better concurrent performance via segment locking."
+    },
+    {
+      "id": "q26",
+      "type": "open",
+      "question": "What is the difference between `Stream.map()` and `Stream.flatMap()`?",
+      "modelAnswer": "`map(fn)` applies `fn` to each element and produces a stream of the same size — each element is transformed one-to-one. `flatMap(fn)` applies `fn` that returns a Stream for each element, then flattens all those streams into a single stream — useful for one-to-many transformations like extracting all words from a list of sentences.",
+      "keyPoints": ["map: 1-to-1 transformation", "flatMap: 1-to-many + flatten", "function returns a Stream in flatMap"]
+    },
+    {
+      "id": "q27",
+      "type": "mcq",
+      "question": "What is the result of `Optional.empty().orElseThrow()`?",
+      "options": ["null", "Optional.empty()", "throws NoSuchElementException", "throws NullPointerException"],
+      "answer": 2,
+      "explanation": "`orElseThrow()` (no-arg variant) throws `NoSuchElementException` when the optional is empty."
+    },
+    {
+      "id": "q28",
+      "type": "truefalse",
+      "question": "Pattern matching for `instanceof` (Java 16+) lets you bind the cast result to a variable in the same expression.",
+      "answer": true,
+      "explanation": "Example: `if (obj instanceof String s) { ... use s ... }`"
+    },
+    {
+      "id": "q29",
+      "type": "mcq",
+      "question": "Which interface is the parent of `Set`, `List`, and `Queue`?",
+      "options": ["Iterable", "Collection", "Map", "Stream"],
+      "answer": 1,
+      "explanation": "`Collection` is the root of those three. `Iterable` is the parent of `Collection`."
+    },
+    {
+      "id": "q30",
+      "type": "open",
+      "question": "Why is the `final` keyword often used on local variables captured by a lambda?",
+      "modelAnswer": "Local variables captured by a lambda must be either explicitly `final` or 'effectively final' (never reassigned after initialization). This is because lambdas may execute on a different thread or at a later time, and Java needs to guarantee the captured value cannot change unexpectedly. Marking the variable `final` makes the intent explicit and prevents accidental reassignment.",
+      "keyPoints": ["effectively final requirement", "thread/timing safety", "captured by value, not reference"]
+    }
+  ]
+}
