@@ -1,0 +1,554 @@
+{
+  "id": "test-java-fr",
+  "lang": "fr",
+  "title": "Java 8 / 17 — Test blanc d'entretien",
+  "description": "Test complet d'entretien couvrant chaque section des notes Java : fondamentaux du langage, POO, collections, exceptions, I/O, sérialisation, concurrence, Streams/Lambdas/Optional, et les 10 design patterns principaux.",
+  "passingScore": 0.6,
+  "questions": [
+    {
+      "id": "j1",
+      "type": "mcq",
+      "question": "Pourquoi Java est-il considéré comme indépendant de la plateforme ?",
+      "options": [
+        "Parce que la JVM est identique sur tous les systèmes d'exploitation",
+        "Parce que le code source est compilé en bytecode que toute JVM peut exécuter",
+        "Parce que les programmes Java sont interprétés directement depuis les fichiers .java",
+        "Parce que le JDK fournit un compilateur natif pour chaque OS"
+      ],
+      "answer": 1,
+      "explanation": "Le code source Java est compilé en bytecode (.class). Toute plateforme disposant d'une JVM compatible peut exécuter le même bytecode — « Write Once, Run Anywhere »."
+    },
+    {
+      "id": "j2",
+      "type": "truefalse",
+      "question": "La JVM elle-même est indépendante de la plateforme.",
+      "answer": false,
+      "explanation": "La JVM est spécifique à chaque plateforme (binaires différents par OS / architecture), mais toutes les implémentations suivent la même spécification, donc le bytecode se comporte de manière uniforme."
+    },
+    {
+      "id": "j3",
+      "type": "mcq",
+      "question": "Quelle affirmation décrit le mieux la différence entre JDK et JRE ?",
+      "options": [
+        "JDK = JVM uniquement ; JRE = JVM + compilateur",
+        "JDK = JRE + outils de développement (javac, javadoc, jlink) ; JRE = JVM + bibliothèque standard",
+        "JDK et JRE sont identiques depuis Java 11",
+        "Le JRE sert à compiler le code, le JDK uniquement à l'exécuter"
+      ],
+      "answer": 1,
+      "explanation": "Le JDK contient le JRE plus les outils de développement. Le JRE contient la JVM plus les bibliothèques standard — suffisant pour exécuter, mais pas pour compiler."
+    },
+    {
+      "id": "j4",
+      "type": "mcq",
+      "question": "Quelles versions Java sont des versions LTS (Long-Term Support) ?",
+      "options": [
+        "Java 9, 10, 12, 13",
+        "Java 8, 11, 17, 21",
+        "Uniquement Java 8 et Java 21",
+        "Toutes les versions depuis Java 9 sont LTS"
+      ],
+      "answer": 1,
+      "explanation": "Les versions LTS sont 8, 11, 17 et 21 (dernière LTS, sortie en septembre 2023). Les versions non-LTS ne sont supportées qu'environ 6 mois."
+    },
+    {
+      "id": "j5",
+      "type": "open",
+      "question": "Expliquez la différence entre Oracle JDK et OpenJDK depuis Java 17.",
+      "modelAnswer": "OpenJDK est l'implémentation open-source de référence de la spécification Java SE (licence GPL avec exception classpath). Oracle JDK est la distribution d'Oracle construite à partir des mêmes sources OpenJDK — depuis Java 17 le code est essentiellement identique. Les principales différences sont la licence (Oracle No-Fee Terms vs GPL), le packaging (installateurs, support commercial optionnel) et certains extras non essentiels. Pour la plupart des applications, ils sont fonctionnellement équivalents.",
+      "keyPoints": ["OpenJDK = référence open source", "Code essentiellement identique depuis 17", "Différence de licence (NFTC vs GPL)", "Oracle ajoute support / installateurs"]
+    },
+    {
+      "id": "j6",
+      "type": "mcq",
+      "question": "Quel modificateur d'accès permet l'accès depuis le même package ET depuis les sous-classes de tout package ?",
+      "options": ["private", "protected", "default (package-private)", "public"],
+      "answer": 1,
+      "explanation": "`protected` est accessible dans le même package et dans toute sous-classe — même déclarée dans un autre package."
+    },
+    {
+      "id": "j7",
+      "type": "multi",
+      "question": "Quelles affirmations sur le mot-clé `final` sont correctes ? (cochez toutes les bonnes réponses)",
+      "options": [
+        "Une variable final ne peut être assignée qu'une seule fois",
+        "Une méthode final ne peut pas être surchargée (override)",
+        "Une classe final ne peut pas être héritée",
+        "Une référence final interdit toute modification de l'état interne de l'objet référencé"
+      ],
+      "answer": [0, 1, 2],
+      "explanation": "`final` rend une variable assignable une seule fois, une méthode non-overridable et une classe non-extendable. Pour les références d'objet, il fige la référence, PAS l'état interne — `final List l = new ArrayList<>()` autorise toujours `l.add(...)`."
+    },
+    {
+      "id": "j8",
+      "type": "mcq",
+      "question": "Quel mot-clé permet à une interface de déclarer une méthode AVEC un corps depuis Java 8 ?",
+      "options": ["abstract", "final", "default", "synchronized"],
+      "answer": 2,
+      "explanation": "Java 8 a ajouté les méthodes `default` (et `static`) dans les interfaces, permettant des implémentations sans casser les implémenteurs existants."
+    },
+    {
+      "id": "j9",
+      "type": "mcq",
+      "question": "Qu'est-ce que le type casting en Java ?",
+      "options": [
+        "Comparer deux types avec ==",
+        "Convertir une valeur d'un type vers un autre (widening implicite ou narrowing explicite)",
+        "Définir des génériques sur une classe",
+        "Convertir un primitif en son wrapper"
+      ],
+      "answer": 1,
+      "explanation": "Le casting convertit le type d'une valeur. Le widening (int → double) est implicite ; le narrowing ((int) 5.5) est explicite et peut perdre de la précision ou lever une `ClassCastException`."
+    },
+    {
+      "id": "j10",
+      "type": "mcq",
+      "question": "Que renvoie `condition ? a : b` ?",
+      "options": [
+        "Toujours `a`",
+        "`a` si la condition est vraie, sinon `b`",
+        "Une exception si la condition est null",
+        "C'est une expression de pattern matching de Java 14+"
+      ],
+      "answer": 1,
+      "explanation": "L'opérateur ternaire est un raccourci pour if/else : il retourne la première expression si la condition est vraie, la seconde sinon."
+    },
+    {
+      "id": "j11",
+      "type": "open",
+      "question": "Pourquoi l'encapsulation est-elle considérée comme l'un des quatre piliers de la POO ? Donnez un exemple concret.",
+      "modelAnswer": "L'encapsulation cache l'état interne d'un objet derrière une API contrôlée (champs privés + getters/setters publics). Elle protège les invariants, permet à l'implémentation d'évoluer sans casser les clients, et centralise la validation. Exemple : une classe Person garde `private int age` et expose `setAge(int v)` qui lève une exception si v < 0 — les clients ne peuvent pas contourner la règle.",
+      "keyPoints": ["champs privés", "accesseurs publics", "protège les invariants", "validation dans les setters", "l'implémentation peut évoluer"]
+    },
+    {
+      "id": "j12",
+      "type": "truefalse",
+      "question": "Une classe abstraite peut avoir un constructeur et des champs d'instance avec un état.",
+      "answer": true,
+      "explanation": "Oui — les classes abstraites peuvent avoir des constructeurs, des champs d'instance, des méthodes concrètes et des méthodes abstraites. Elles ne peuvent simplement pas être instanciées directement."
+    },
+    {
+      "id": "j13",
+      "type": "multi",
+      "question": "Comparée à une classe abstraite, une interface en Java moderne (8+) :",
+      "options": [
+        "Permet l'implémentation multiple par une même classe",
+        "Peut contenir un état d'instance (champs non-final, non-static)",
+        "Peut déclarer des méthodes default et static avec un corps",
+        "Rend implicitement ses méthodes non-default public abstract"
+      ],
+      "answer": [0, 2, 3],
+      "explanation": "Les interfaces supportent l'implémentation multiple, les méthodes default/static, et les méthodes abstraites implicitement publiques. Elles ne peuvent pas contenir d'état d'instance mutable — uniquement des constantes `public static final`."
+    },
+    {
+      "id": "j14",
+      "type": "mcq",
+      "question": "Quel mot-clé force une sous-classe à fournir sa propre implémentation d'une méthode ?",
+      "options": ["final", "static", "abstract", "private"],
+      "answer": 2,
+      "explanation": "Une méthode `abstract` n'a pas de corps et oblige toute sous-classe concrète à l'implémenter."
+    },
+    {
+      "id": "j15",
+      "type": "mcq",
+      "question": "Quel type d'héritage de classe Java supporte-t-il ?",
+      "options": [
+        "Héritage multiple via `extends`",
+        "Héritage simple via `extends`, héritage multiple de type via `implements`",
+        "Héritage multiple uniquement via les classes abstraites",
+        "Aucun héritage — uniquement la composition"
+      ],
+      "answer": 1,
+      "explanation": "Une classe ne peut `extends` qu'un seul parent (héritage simple) mais peut `implements` un nombre quelconque d'interfaces, donnant un héritage multiple de type."
+    },
+    {
+      "id": "j16",
+      "type": "mcq",
+      "question": "Surcharge (overloading) vs redéfinition (overriding) — laquelle est vraie ?",
+      "options": [
+        "La surcharge est résolue à l'exécution, la redéfinition à la compilation",
+        "La surcharge utilise des listes de paramètres différentes dans la même classe ; la redéfinition redéfinit une méthode héritée avec la même signature",
+        "La redéfinition est interdite si la méthode parente est public",
+        "Les deux nécessitent l'annotation @Override"
+      ],
+      "answer": 1,
+      "explanation": "Surcharge = polymorphisme à la compilation (même nom, listes de paramètres différentes). Redéfinition = polymorphisme à l'exécution (même signature, l'enfant redéfinit le comportement parent)."
+    },
+    {
+      "id": "j17",
+      "type": "open",
+      "question": "Comment Java résout-il un conflit lorsqu'une classe implémente deux interfaces qui déclarent toutes deux la MÊME méthode default ?",
+      "modelAnswer": "Le compilateur signale une ambiguïté et force la classe implémentatrice à redéfinir la méthode en conflit. Dans la redéfinition, la classe peut explicitement appeler l'une des versions parentes via la syntaxe `InterfaceName.super.method()`.",
+      "keyPoints": ["erreur d'ambiguïté à la compilation", "doit redéfinir dans la classe", "InterfaceName.super.method() pour désambiguïser"]
+    },
+    {
+      "id": "j18",
+      "type": "mcq",
+      "question": "Quelle collection garantit l'absence de doublons ET conserve les éléments dans leur ordre naturel trié ?",
+      "options": ["HashSet", "LinkedHashSet", "TreeSet", "ArrayList"],
+      "answer": 2,
+      "explanation": "`TreeSet` est basé sur un arbre rouge-noir : il interdit les doublons et stocke les éléments dans l'ordre naturel (ou selon un Comparator fourni)."
+    },
+    {
+      "id": "j19",
+      "type": "mcq",
+      "question": "Quelle implémentation de `Map` est un choix thread-safe pour les lectures et écritures concurrentes ?",
+      "options": ["HashMap", "TreeMap", "LinkedHashMap", "ConcurrentHashMap"],
+      "answer": 3,
+      "explanation": "`ConcurrentHashMap` est conçue pour l'accès concurrent via verrouillage à grain fin / CAS, contrairement aux trois autres qui ne sont pas thread-safe."
+    },
+    {
+      "id": "j20",
+      "type": "mcq",
+      "question": "Quelle méthode de Deque se comporte comme un push de Stack (LIFO) ?",
+      "options": ["addLast()", "addFirst()", "offer()", "poll()"],
+      "answer": 1,
+      "explanation": "Une Deque utilisée comme une pile empile avec `addFirst()` (ou `push()`) et dépile avec `removeFirst()` (ou `pop()`)."
+    },
+    {
+      "id": "j21",
+      "type": "truefalse",
+      "question": "Appeler `add()` sur une liste créée avec `List.of(\"A\",\"B\")` lève UnsupportedOperationException.",
+      "answer": true,
+      "explanation": "Depuis Java 9, les méthodes statiques de fabrique (`List.of`, `Set.of`, `Map.of`) renvoient des collections immuables — toute modification structurelle lève `UnsupportedOperationException`."
+    },
+    {
+      "id": "j22",
+      "type": "open",
+      "question": "Expliquez la différence entre `Comparable` et `Comparator`. Quand choisiriez-vous chacun ?",
+      "modelAnswer": "`Comparable<T>` définit l'ordre naturel d'une classe via `compareTo(T o)` — implémenté à l'intérieur de la classe elle-même. `Comparator<T>` définit un ordre externe et alternatif via `compare(T a, T b)` — utile lorsqu'on ne peut pas ou ne veut pas modifier la classe, lorsque plusieurs ordres sont nécessaires, ou pour trier des types tiers. Les deux retournent négatif / zéro / positif pour exprimer inférieur / égal / supérieur. Avec Java 8, les comparateurs peuvent être composés avec `Comparator.comparing(...).thenComparing(...)`.",
+      "keyPoints": ["Comparable = ordre naturel, interne", "Comparator = externe, alternatif", "Plusieurs comparateurs par classe possibles", "Composition Java 8 avec thenComparing"]
+    },
+    {
+      "id": "j23",
+      "type": "mcq",
+      "question": "Quelle exception est CHECKED ?",
+      "options": ["NullPointerException", "ArithmeticException", "IOException", "IllegalArgumentException"],
+      "answer": 2,
+      "explanation": "`IOException` étend `Exception` et est checked — le compilateur vous force à l'attraper ou à la déclarer dans `throws`. Les trois autres étendent `RuntimeException` (unchecked)."
+    },
+    {
+      "id": "j24",
+      "type": "truefalse",
+      "question": "Le bloc `finally` s'exécute même si le bloc `try` ou `catch` exécute un `return`.",
+      "answer": true,
+      "explanation": "Le bloc `finally` s'exécute toujours — même après un `return`, une exception ou une erreur lancée dans `try`/`catch` — sauf si la JVM est tuée (System.exit, panne matérielle)."
+    },
+    {
+      "id": "j25",
+      "type": "mcq",
+      "question": "Une méthode redéfinie dans une sous-classe peut lever :",
+      "options": [
+        "Une exception checked plus large que la méthode parente",
+        "Toute nouvelle exception checked non déclarée par le parent",
+        "Uniquement les mêmes exceptions checked ou des sous-classes de celles déclarées par le parent",
+        "Uniquement des exceptions unchecked, jamais checked"
+      ],
+      "answer": 2,
+      "explanation": "Une redéfinition peut restreindre mais pas élargir les exceptions checked : elle peut lever les mêmes ou des sous-classes. Elle peut librement lever toute exception unchecked."
+    },
+    {
+      "id": "j26",
+      "type": "mcq",
+      "question": "Quelle classe est la façon recommandée de lire un fichier texte LIGNE PAR LIGNE efficacement ?",
+      "options": ["FileInputStream", "FileReader", "BufferedReader", "ObjectInputStream"],
+      "answer": 2,
+      "explanation": "`BufferedReader` enveloppe un `Reader` (souvent un `FileReader`) et expose `readLine()` avec un buffer interne — bien plus rapide que la lecture caractère par caractère."
+    },
+    {
+      "id": "j27",
+      "type": "truefalse",
+      "question": "`try-with-resources` ferme automatiquement tout objet qui implémente `AutoCloseable`.",
+      "answer": true,
+      "explanation": "Les ressources déclarées dans l'en-tête `try (...)` sont fermées automatiquement dans l'ordre inverse de déclaration, tant qu'elles implémentent `AutoCloseable` (ce qui inclut `Closeable`)."
+    },
+    {
+      "id": "j28",
+      "type": "open",
+      "question": "Qu'est-ce que `serialVersionUID`, et que se passe-t-il si vous le changez sur une classe existante ?",
+      "modelAnswer": "`serialVersionUID` est un `private static final long` déclaré dans une classe `Serializable`. Il identifie une version spécifique de la forme sérialisée de la classe. Lors de la désérialisation, le runtime compare l'UID stocké dans le flux d'octets avec l'UID de la classe chargée ; s'ils diffèrent, il lève `InvalidClassException`. Le changer casse donc la compatibilité avec les données précédemment sérialisées — mais permet de signaler des changements incompatibles intentionnels. Si vous n'en déclarez pas, le compilateur en génère un automatiquement, fragile, basé sur la structure de la classe.",
+      "keyPoints": ["versionnement de la forme sérialisée", "InvalidClassException en cas de mismatch", "auto-généré si absent", "valeur explicite protège la compatibilité"]
+    },
+    {
+      "id": "j29",
+      "type": "mcq",
+      "question": "Quel mot-clé exclut un champ de la sérialisation Java par défaut ?",
+      "options": ["volatile", "transient", "static", "synchronized"],
+      "answer": 1,
+      "explanation": "`transient` indique au mécanisme de sérialisation d'ignorer le champ ; à la désérialisation, le champ reçoit sa valeur par défaut (null / 0 / false). Les champs static ne sont pas non plus sérialisés (ils appartiennent à la classe)."
+    },
+    {
+      "id": "j30",
+      "type": "mcq",
+      "question": "Quelle interface vous donne le contrôle programmatique total sur la lecture et l'écriture de votre forme sérialisée ?",
+      "options": ["Serializable", "Externalizable", "Cloneable", "Comparable"],
+      "answer": 1,
+      "explanation": "`Externalizable` exige que vous implémentiez `writeExternal()` et `readExternal()` — plus lent à écrire mais offre un contrôle complet sur le format binaire."
+    },
+    {
+      "id": "j31",
+      "type": "mcq",
+      "question": "Qu'est-ce qu'une Functional Interface ?",
+      "options": [
+        "Une interface avec au moins une méthode default",
+        "Une interface avec EXACTEMENT une méthode abstraite (les méthodes default/static ne comptent pas)",
+        "Une interface annotée avec @Override",
+        "Toute interface déclarée dans un package nommé `function`"
+      ],
+      "answer": 1,
+      "explanation": "Une functional interface déclare exactement une méthode abstraite. L'annotation optionnelle `@FunctionalInterface` fait appliquer cette règle par le compilateur. Les lambdas et références de méthode peuvent cibler de telles interfaces."
+    },
+    {
+      "id": "j32",
+      "type": "multi",
+      "question": "Lesquelles font partie des opérations de pipeline de l'API Streams ?",
+      "options": ["map", "filter", "collect", "wait"],
+      "answer": [0, 1, 2],
+      "explanation": "`map`, `filter`, `collect` (ainsi que `reduce`, `flatMap`, `sorted`, `distinct`, `limit`, `forEach`...) sont des opérations Stream. `wait` appartient à `Object` pour la synchronisation des threads."
+    },
+    {
+      "id": "j33",
+      "type": "open",
+      "question": "Quel problème résout `Optional<T>`, et quelle est la différence entre `Optional.empty()` et `null` ?",
+      "modelAnswer": "`Optional<T>` est un conteneur qui peut ou non contenir une valeur non-null. Il documente qu'une méthode peut légitimement retourner « pas de valeur » et force l'appelant à gérer l'absence (avec `isPresent`, `ifPresent`, `orElse`, `map`, `flatMap`...). Il réduit les `NullPointerException` involontaires. `Optional.empty()` est un Optional non-null qui ne contient aucune valeur ; `null` est une véritable absence de tout objet — utiliser une référence null va à l'encontre du but. Bonnes pratiques : ne jamais retourner `null` pour les collections ou pour les valeurs où Optional est plus expressif ; ne jamais stocker un Optional dans un champ ni l'utiliser comme paramètre de méthode.",
+      "keyPoints": ["envelopper les valeurs nullables", "absence explicite", "map/orElse fluides", "Optional.empty != null", "éviter en champ/paramètre"]
+    },
+    {
+      "id": "j34",
+      "type": "truefalse",
+      "question": "`==` compare les références d'objet alors que `.equals()` compare l'égalité logique (lorsqu'elle est correctement redéfinie).",
+      "answer": true,
+      "explanation": "`==` vérifie si deux références pointent vers le même objet en mémoire (ou compare les primitifs par valeur). `.equals()` doit être redéfinie pour comparer le contenu logique — String, Integer, etc. le font."
+    },
+    {
+      "id": "j35",
+      "type": "open",
+      "question": "Quel est le contrat equals/hashCode, et pourquoi est-il crucial pour HashSet / HashMap ?",
+      "modelAnswer": "Le contrat stipule : si `a.equals(b)` est vrai, alors `a.hashCode()` DOIT égaler `b.hashCode()`. L'inverse n'est pas requis (deux objets différents peuvent partager un même hash). equals doit aussi être réflexif, symétrique, transitif, cohérent, et `x.equals(null)` doit être faux. Les collections basées sur le hash (HashSet, HashMap, ConcurrentHashMap) localisent d'abord le bucket via `hashCode()`, puis distinguent les entrées dans le bucket via `equals()`. Casser le contrat conduit à des entrées perdues, des doublons dans un Set, ou `containsKey` retournant false pour une clé qui vient d'être insérée.",
+      "keyPoints": ["égal -> même hash", "hash égal n'implique PAS égal", "buckets localisés par hashCode", "violations causent entrées perdues/dupliquées"]
+    },
+    {
+      "id": "j36",
+      "type": "mcq",
+      "question": "ArrayList vs LinkedList — laquelle est généralement préférée pour l'accès aléatoire par index ?",
+      "options": [
+        "LinkedList — get(i) en O(1)",
+        "ArrayList — get(i) en O(1) grâce à son tableau sous-jacent",
+        "Les deux sont en O(log n)",
+        "Aucune — utiliser HashMap<Integer, T>"
+      ],
+      "answer": 1,
+      "explanation": "ArrayList est basée sur un tableau, donc `get(i)` est en O(1). LinkedList est une liste doublement chaînée, donc `get(i)` est en O(n). Utilisez LinkedList uniquement quand les insertions/suppressions fréquentes aux extrémités dominent."
+    },
+    {
+      "id": "j37",
+      "type": "mcq",
+      "question": "Quelle affirmation sur les méthodes static est correcte ?",
+      "options": [
+        "Les méthodes static peuvent accéder aux champs d'instance directement via `this`",
+        "Les méthodes static appartiennent à la classe, n'ont pas de `this`, et sont appelées avec `ClassName.method()`",
+        "Les méthodes static peuvent être redéfinies polymorphiquement par les sous-classes",
+        "Les méthodes static ne peuvent pas accéder aux champs static"
+      ],
+      "answer": 1,
+      "explanation": "Les méthodes static appartiennent à la classe, pas à une instance. Elles n'ont pas de `this`, ne peuvent pas accéder directement aux champs d'instance, et ne sont pas overridées — elles sont masquées dans les sous-classes (method hiding, pas overriding)."
+    },
+    {
+      "id": "j38",
+      "type": "mcq",
+      "question": "Quel est l'ordre d'exécution des blocs static, des blocs d'initialisation d'instance, et des constructeurs ?",
+      "options": [
+        "Constructeur → bloc d'instance → bloc static",
+        "Bloc static (une fois au chargement de la classe) → bloc d'instance → constructeur (à chaque `new`)",
+        "Bloc d'instance → bloc static → constructeur",
+        "Ils s'exécutent en parallèle"
+      ],
+      "answer": 1,
+      "explanation": "Les blocs static s'exécutent une fois au chargement de la classe. Pour chaque `new`, les blocs d'initialisation d'instance s'exécutent AVANT le corps du constructeur."
+    },
+    {
+      "id": "j39",
+      "type": "open",
+      "question": "Comment rendre une classe immuable en Java ? Listez les règles.",
+      "modelAnswer": "1) Déclarer la classe `final` pour qu'elle ne puisse pas être étendue et affaiblie. 2) Rendre chaque champ `private final`. 3) Initialiser les champs uniquement dans le constructeur. 4) Ne pas exposer de setters. 5) Pour les champs internes mutables (Date, List, tableaux), les copier défensivement dans le constructeur et dans tout getter pour que les appelants ne puissent pas muter l'état interne. 6) Éviter de fuiter `this` depuis le constructeur. Résultat : les instances sont intrinsèquement thread-safe, peuvent être mises en cache, utilisées comme clés de Map, et partagées librement. `String`, `Integer`, `LocalDate`, etc. sont des exemples classiques.",
+      "keyPoints": ["classe final + champs final", "pas de setters", "copies défensives", "thread-safe + cacheable", "exemples : String, LocalDate"]
+    },
+    {
+      "id": "j40",
+      "type": "mcq",
+      "question": "Quel design pattern fournit une instance globale unique d'une classe ?",
+      "options": ["Factory Method", "Builder", "Singleton", "Proxy"],
+      "answer": 2,
+      "explanation": "Singleton restreint l'instanciation à une seule instance et fournit un accès global via une méthode statique `getInstance()` (souvent protégée pour la thread-safety)."
+    },
+    {
+      "id": "j41",
+      "type": "mcq",
+      "question": "Quel design pattern découple la création d'objets de l'appelant, en retournant une sous-classe concrète selon un paramètre ?",
+      "options": ["Adapter", "Factory Method", "Decorator", "Observer"],
+      "answer": 1,
+      "explanation": "Factory Method centralise la logique de création. Le client appelle `factory.create(\"dog\")` et obtient la bonne sous-classe `Animal` sans connaître le type concret."
+    },
+    {
+      "id": "j42",
+      "type": "mcq",
+      "question": "Vous devez construire un objet `User` complexe avec de nombreux champs optionnels, tout en gardant le code lisible. Quel pattern convient le mieux ?",
+      "options": ["Singleton", "Builder", "Strategy", "Proxy"],
+      "answer": 1,
+      "explanation": "Le pattern Builder (`new User.Builder().setName(..).setAge(..).build()`) gère la construction complexe/optionnelle sans faire exploser le nombre de constructeurs."
+    },
+    {
+      "id": "j43",
+      "type": "mcq",
+      "question": "Choisir dynamiquement parmi plusieurs algorithmes de tri à l'exécution est un cas d'école pour quel pattern ?",
+      "options": ["Strategy", "Observer", "Template Method", "Command"],
+      "answer": 0,
+      "explanation": "Strategy encapsule une famille d'algorithmes interchangeables derrière une interface commune. Le client en choisit un à l'exécution : `new Sorter(new QuickSort()).sort(data)`."
+    },
+    {
+      "id": "j44",
+      "type": "mcq",
+      "question": "Quel pattern établit une dépendance un-à-plusieurs pour que tous les dépendants soient notifiés automatiquement quand le sujet change ?",
+      "options": ["Decorator", "Observer", "Adapter", "Command"],
+      "answer": 1,
+      "explanation": "Observer : un Subject garde une liste d'Observers et les notifie tous (ex. `update()`) quand son état change. Utilisé par PropertyChangeListener de Java, RxJava, etc."
+    },
+    {
+      "id": "j45",
+      "type": "mcq",
+      "question": "Ajouter un comportement optionnel (logging, chiffrement…) à un objet à l'exécution, sans héritage, est l'objectif de quel pattern ?",
+      "options": ["Decorator", "Singleton", "Factory Method", "Proxy"],
+      "answer": 0,
+      "explanation": "Decorator enveloppe un composant avec un autre objet partageant la même interface, ajoutant des comportements supplémentaires en couches tout en préservant l'API d'origine. Composition plutôt qu'héritage."
+    },
+    {
+      "id": "j46",
+      "type": "mcq",
+      "question": "Vous devez faire entrer une classe tierce avec une interface incompatible dans votre code. Quel pattern utilisez-vous ?",
+      "options": ["Adapter", "Strategy", "Observer", "Builder"],
+      "answer": 0,
+      "explanation": "Adapter implémente votre interface cible et délègue en interne à l'« adaptee » étranger, faisant le pont entre les deux APIs incompatibles."
+    },
+    {
+      "id": "j47",
+      "type": "mcq",
+      "question": "Quel pattern est typiquement utilisé pour le lazy loading, les contrôles de sécurité ou l'invocation de méthode distante ?",
+      "options": ["Adapter", "Proxy", "Builder", "Template Method"],
+      "answer": 1,
+      "explanation": "Proxy se substitue à l'objet réel et partage la même interface. Il peut différer la création (proxy virtuel), faire respecter le contrôle d'accès (proxy de protection), ou appeler un service distant (proxy distant)."
+    },
+    {
+      "id": "j48",
+      "type": "mcq",
+      "question": "Définir le squelette d'un algorithme dans une classe de base et laisser les sous-classes remplir les étapes spécifiques est le rôle de quel pattern ?",
+      "options": ["Strategy", "Command", "Template Method", "Observer"],
+      "answer": 2,
+      "explanation": "Template Method place la structure invariante de l'algorithme dans une méthode abstraite (ex. `generateReport()` appelle `header()`, `content()`, `footer()`), et les sous-classes implémentent les étapes variables."
+    },
+    {
+      "id": "j49",
+      "type": "mcq",
+      "question": "Encapsuler une action en objet pour qu'elle puisse être mise en file, journalisée, annulée ou exécutée plus tard est quel pattern ?",
+      "options": ["Command", "Decorator", "Singleton", "Adapter"],
+      "answer": 0,
+      "explanation": "Command transforme une requête en objet de première classe avec `execute()` (et souvent `undo()`), permettant de paramétrer, mettre en file ou persister les requêtes."
+    },
+    {
+      "id": "j50",
+      "type": "truefalse",
+      "question": "Une interface Marker (ex. `Serializable`, `Cloneable`) ne déclare aucune méthode — sa simple implémentation marque une classe avec des métadonnées.",
+      "answer": true,
+      "explanation": "Les interfaces marker n'ont pas de méthodes. Le runtime ou le framework vérifie `instanceof MarkerType` pour activer un comportement spécial. Java moderne les remplace souvent par des annotations."
+    },
+    {
+      "id": "j51",
+      "type": "mcq",
+      "question": "Quelle opération Stream est TERMINALE (force l'évaluation du pipeline) ?",
+      "options": ["map", "filter", "collect", "sorted"],
+      "answer": 2,
+      "explanation": "`collect` est terminale — elle déclenche l'exécution et produit un résultat. `map`, `filter`, `sorted`, `distinct`, `limit`, `flatMap` sont intermédiaires (lazy)."
+    },
+    {
+      "id": "j52",
+      "type": "open",
+      "question": "Listez quatre fonctionnalités principales introduites en Java 8 qui ont changé la façon dont le code Java est écrit.",
+      "modelAnswer": "1) Expressions lambda — syntaxe fonctionnelle concise `(x,y) -> x+y` permettant un style fonctionnel. 2) API Streams — opérations de pipeline déclaratives sur les collections (map/filter/reduce, traitement parallèle). 3) `Optional<T>` — représentation explicite et type-safe d'une valeur absente, remplaçant de nombreux contrôles `null`. 4) Méthodes `default` et `static` sur les interfaces — permettent aux interfaces d'évoluer sans casser les implémenteurs existants. (Bonus : la nouvelle API `java.time`, les références de méthode, `CompletableFuture`.)",
+      "keyPoints": ["Lambdas", "Streams", "Optional", "méthodes default/static d'interface", "java.time"]
+    },
+    {
+      "id": "j53",
+      "type": "mcq",
+      "question": "Dans l'API `java.time` (Java 8+), quelle classe représente une date SANS heure et sans fuseau horaire ?",
+      "options": ["LocalDate", "LocalDateTime", "ZonedDateTime", "Instant"],
+      "answer": 0,
+      "explanation": "`LocalDate` contient année-mois-jour sans heure ni fuseau. `LocalDateTime` ajoute l'heure, `ZonedDateTime` ajoute un fuseau, `Instant` est un point sur la timeline UTC (nanos d'epoch)."
+    },
+    {
+      "id": "j54",
+      "type": "truefalse",
+      "question": "Les Errors (ex. OutOfMemoryError, StackOverflowError) doivent normalement être attrapées et gérées par le code applicatif.",
+      "answer": false,
+      "explanation": "`Error` représente des problèmes graves au niveau JVM dont les applications ne peuvent pas se remettre de façon significative. Elles doivent généralement être laissées remonter."
+    },
+    {
+      "id": "j55",
+      "type": "mcq",
+      "question": "Comment récupère-t-on correctement la taille d'une `List`, d'un tableau et d'une `String` respectivement ?",
+      "options": [
+        "list.length, array.size(), string.size()",
+        "list.size(), array.length, string.length()",
+        "list.count(), array.length(), string.length",
+        "Tous les trois utilisent .size()"
+      ],
+      "answer": 1,
+      "explanation": "Les Collections exposent `size()` (une méthode). Les tableaux exposent `length` (un champ, pas une méthode). Les Strings exposent `length()` (une méthode)."
+    },
+    {
+      "id": "j56",
+      "type": "multi",
+      "question": "Lesquelles sont des façons valides de créer un thread / soumettre un travail en Java moderne ?",
+      "options": [
+        "Implémenter Runnable et le passer à un Thread ou ExecutorService",
+        "Implémenter Callable<V> pour un résultat + ExecutorService.submit",
+        "Utiliser CompletableFuture.supplyAsync(...)",
+        "Appeler .equals() sur la classe Thread"
+      ],
+      "answer": [0, 1, 2],
+      "explanation": "Runnable, Callable + ExecutorService et CompletableFuture sont toutes des façons standard de lancer du travail asynchrone. `.equals()` n'a aucun rapport."
+    },
+    {
+      "id": "j57",
+      "type": "open",
+      "question": "Quelle est la différence entre `Collection` et `Stream` ? Peut-on réutiliser un Stream ?",
+      "modelAnswer": "Une Collection est une structure de données qui contient physiquement les éléments en mémoire (eager). Un Stream est un pipeline d'opérations évalué paresseusement sur une source (collection, tableau, générateur…) et ne produit un résultat que lorsqu'une opération terminale est appelée. Un Stream est à usage unique : une fois qu'une opération terminale est exécutée (ou qu'une opération intermédiaire avec état le consomme), le Stream est fermé et toute utilisation supplémentaire lève `IllegalStateException`. Pour réutiliser, construisez un nouveau Stream depuis la source. Les Streams supportent aussi le parallélisme (`.parallelStream()`) qu'une Collection ne fournit pas directement.",
+      "keyPoints": ["Collection = données ; Stream = pipeline", "Lazy / opérations terminales", "À usage unique", "Option parallèle"]
+    },
+    {
+      "id": "j58",
+      "type": "mcq",
+      "question": "Que fait le constructeur `default` (sans argument, généré par le compilateur) si vous ne déclarez aucun constructeur ?",
+      "options": [
+        "Rien — il n'existe pas sauf si vous l'écrivez",
+        "Il est ajouté automatiquement par le compilateur et appelle super() implicitement",
+        "Il lève NullPointerException à l'exécution",
+        "Il initialise chaque champ à sa valeur déclarée, puis sort sans appeler super()"
+      ],
+      "answer": 1,
+      "explanation": "Si vous ne déclarez aucun constructeur, le compilateur génère un constructeur public sans argument dont le corps est juste un `super();` implicite. Dès que vous déclarez UN quelconque constructeur, le défaut disparaît."
+    },
+    {
+      "id": "j59",
+      "type": "truefalse",
+      "question": "Une classe interne anonyme peut être utilisée pour instancier une interface en une seule expression (ex. `new Runnable() { public void run() { ... } }`).",
+      "answer": true,
+      "explanation": "Les classes internes anonymes fournissent une implémentation inline d'une interface ou d'une classe abstraite. Depuis Java 8, les lambdas expriment la même chose plus concisément pour les interfaces fonctionnelles."
+    },
+    {
+      "id": "j60",
+      "type": "open",
+      "question": "Brièvement, quel était l'objectif du Java Module System (projet Jigsaw, introduit en Java 9) ?",
+      "modelAnswer": "Le système de modules permet de regrouper des packages liés dans un module nommé qui déclare explicitement quels packages il `exports` et quels autres modules il `requires` (fichier `module-info.java`). Objectifs : encapsulation forte (les API internes ne sont plus accessibles par réflexion), configuration fiable (fini le 'JAR hell' / les entrées classpath manquantes ou dupliquées), plateforme scalable (`jlink` construit des JREs personnalisés ne contenant que les modules nécessaires), et amélioration des performances et de la sécurité.",
+      "keyPoints": ["module-info.java", "exports / requires", "encapsulation forte", "fini le JAR hell", "runtimes personnalisés via jlink"]
+    }
+  ]
+}

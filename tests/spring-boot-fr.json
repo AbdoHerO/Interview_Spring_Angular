@@ -1,0 +1,649 @@
+{
+  "id": "test-spring-boot-fr",
+  "lang": "fr",
+  "title": "Spring Boot — Test blanc d'entretien",
+  "description": "Test complet d'entretien couvrant l'ensemble des notes Spring Boot : setup, profils, JPA, validation, transactions et verrouillage, Spring Security & JWT, gestion d'exceptions, tests, fichiers/CSV/PDF, async/scheduling, cache, logging, clients REST, Criteria API, microservices (Eureka, Gateway, Feign, Circuit Breaker, Config), Kafka, Spring Batch, Docker, Liquibase.",
+  "passingScore": 0.6,
+  "questions": [
+    {
+      "id": "s1",
+      "type": "mcq",
+      "question": "Quel est l'objectif principal de Spring Initializr (start.spring.io) ?",
+      "options": [
+        "Déployer des applications Spring Boot dans le cloud",
+        "Générer une structure de projet Spring Boot prête à l'emploi avec les dépendances et l'outil de build sélectionnés",
+        "Exécuter des tests unitaires dans le cloud",
+        "Remplacer Maven par un outil de build personnalisé"
+      ],
+      "answer": 1,
+      "explanation": "Spring Initializr scaffolde un projet (Maven ou Gradle) avec la version Java choisie, le packaging et les starters, prêt à être importé dans l'IDE."
+    },
+    {
+      "id": "s2",
+      "type": "mcq",
+      "question": "Qu'est-ce qu'une dépendance « starter » comme `spring-boot-starter-web` ?",
+      "options": [
+        "Un agent runtime qui profile la JVM",
+        "Un ensemble curé de dépendances compatibles regroupées derrière un seul artefact, déclenchant l'auto-configuration appropriée",
+        "Un plugin remplaçant Maven Surefire",
+        "Un générateur de code qui écrit les contrôleurs automatiquement"
+      ],
+      "answer": 1,
+      "explanation": "Les starters regroupent un ensemble cohérent de dépendances versionnées et signalent à Spring Boot d'auto-configurer les fonctionnalités associées (ex. `starter-web` apporte Spring MVC + Tomcat embarqué + Jackson)."
+    },
+    {
+      "id": "s3",
+      "type": "mcq",
+      "question": "Quel fichier est l'alternative YAML canonique à `application.properties` ?",
+      "options": ["application.xml", "application.yml", "config.json", "spring.cfg"],
+      "answer": 1,
+      "explanation": "Spring Boot lit soit `application.properties` soit `application.yml` (format YAML) depuis le classpath."
+    },
+    {
+      "id": "s4",
+      "type": "open",
+      "question": "Expliquez comment fonctionnent les Spring Profiles et comment vous activeriez le profil 'dev'.",
+      "modelAnswer": "Les profils permettent de regrouper les beans et la configuration qui ne doivent être actifs que dans un environnement donné (dev, test, prod...). On annote les beans ou les classes @Configuration avec @Profile(\"dev\") afin qu'ils ne soient chargés que lorsque ce profil est actif. Les propriétés spécifiques à l'environnement vont dans `application-dev.yml`, `application-prod.yml`, etc. Pour activer, définissez `spring.profiles.active=dev` dans `application.properties`, passez `--spring.profiles.active=dev` en ligne de commande, ou définissez la variable d'environnement `SPRING_PROFILES_ACTIVE=dev`. Plusieurs profils peuvent être combinés.",
+      "keyPoints": ["annotation @Profile", "application-{profile}.yml", "spring.profiles.active=dev", "CLI / variable d'env", "isoler les configs d'environnement"]
+    },
+    {
+      "id": "s5",
+      "type": "mcq",
+      "question": "Que fait `@EnableAutoConfiguration` (inclus dans `@SpringBootApplication`) ?",
+      "options": [
+        "Il scanne la base de données et génère les entités",
+        "Il auto-configure les beans Spring en fonction des bibliothèques présentes dans le classpath",
+        "Il active le hot reload",
+        "Il désactive Spring Security"
+      ],
+      "answer": 1,
+      "explanation": "L'auto-configuration inspecte le classpath, les beans et les propriétés, puis enregistre des beans par défaut sensés (datasource, MVC, Jackson, JPA, security, ...) que vous pouvez tout de même surcharger."
+    },
+    {
+      "id": "s6",
+      "type": "mcq",
+      "question": "Où déclare-t-on typiquement un bean `PasswordEncoder` personnalisé ?",
+      "options": [
+        "À l'intérieur d'une classe @Entity",
+        "À l'intérieur d'une classe @Configuration via une méthode annotée @Bean",
+        "Dans application.yml",
+        "À l'intérieur d'un @Repository"
+      ],
+      "answer": 1,
+      "explanation": "Les beans personnalisés sont déclarés avec `@Bean` dans une classe `@Configuration` afin que Spring les gère : `@Bean public PasswordEncoder encoder() { return new BCryptPasswordEncoder(); }`."
+    },
+    {
+      "id": "s7",
+      "type": "truefalse",
+      "question": "`spring-boot-devtools` est automatiquement exclu des JARs de production.",
+      "answer": true,
+      "explanation": "DevTools est destiné au développement (auto-restart, LiveReload). Il est désactivé lors de l'exécution d'une application entièrement packagée et n'est pas inclus dans le JAR exécutable repackagé."
+    },
+    {
+      "id": "s8",
+      "type": "mcq",
+      "question": "Quelle annotation marque une classe Java comme entité JPA mappée à une table ?",
+      "options": ["@Component", "@Entity", "@Service", "@Bean"],
+      "answer": 1,
+      "explanation": "`@Entity` (avec `@Id` pour la clé primaire) mappe la classe à une table de base de données gérée par JPA / Hibernate."
+    },
+    {
+      "id": "s9",
+      "type": "multi",
+      "question": "Quelles annotations JPA décrivent les relations entre entités ?",
+      "options": ["@OneToOne", "@OneToMany", "@ManyToMany", "@RestController"],
+      "answer": [0, 1, 2],
+      "explanation": "@OneToOne, @OneToMany, @ManyToOne et @ManyToMany décrivent les associations (souvent combinées avec @JoinColumn / @JoinTable). @RestController est un stéréotype web, pas une relation JPA."
+    },
+    {
+      "id": "s10",
+      "type": "mcq",
+      "question": "Quelle stratégie délègue la génération de la clé primaire à la base de données (typiquement AUTO_INCREMENT) ?",
+      "options": ["GenerationType.SEQUENCE", "GenerationType.TABLE", "GenerationType.IDENTITY", "GenerationType.AUTO"],
+      "answer": 2,
+      "explanation": "`GenerationType.IDENTITY` s'appuie sur la colonne auto-increment de la base de données. `SEQUENCE` utilise une séquence DB ; `TABLE` simule une séquence dans une table ; `AUTO` laisse le provider choisir."
+    },
+    {
+      "id": "s11",
+      "type": "mcq",
+      "question": "Que déclenche `@Valid @RequestBody UserDTO dto` sur une méthode de contrôleur ?",
+      "options": [
+        "Il sérialise le DTO en JSON",
+        "Il valide le DTO contre ses annotations de contrainte (@NotNull, @Size, @Email...) et rejette la requête si l'une échoue",
+        "Il ouvre une transaction de base de données",
+        "Il active la protection CSRF sur l'endpoint"
+      ],
+      "answer": 1,
+      "explanation": "`@Valid` déclenche Bean Validation. Si une contrainte échoue, Spring lève `MethodArgumentNotValidException` (HTTP 400) — sauf si un paramètre `BindingResult` est présent pour gérer les erreurs manuellement."
+    },
+    {
+      "id": "s12",
+      "type": "mcq",
+      "question": "Quelle annotation de contrainte valide qu'une String correspond au format email ?",
+      "options": ["@Pattern", "@Email", "@NotBlank", "@Size"],
+      "answer": 1,
+      "explanation": "`@Email` (Jakarta Bean Validation) valide le format d'email. `@Pattern(regexp=...)` fonctionne aussi mais nécessite une regex personnalisée."
+    },
+    {
+      "id": "s13",
+      "type": "open",
+      "question": "Qu'est-ce que `BindingResult` et pourquoi doit-il apparaître immédiatement après le paramètre @Valid ?",
+      "modelAnswer": "`BindingResult` est le conteneur que Spring remplit avec les erreurs de binding/validation lorsque @Valid s'exécute. Déclaré comme tout premier paramètre suivant l'objet validé, il indique à Spring de NE PAS lever `MethodArgumentNotValidException` et de laisser votre contrôleur décider comment réagir (message d'erreur personnalisé, sauvegarde partielle, retour 400 avec détails par champ, etc.). Méthodes utiles : hasErrors(), getFieldErrors(), getAllErrors(). Si la position est mauvaise, Spring ne saura pas à quelle cible il se réfère.",
+      "keyPoints": ["capture les erreurs de validation", "doit suivre l'argument @Valid", "hasErrors() / getFieldErrors()", "permet de construire une réponse 400 personnalisée"]
+    },
+    {
+      "id": "s14",
+      "type": "multi",
+      "question": "Quelles annotations Spring MVC routent les requêtes HTTP vers une méthode de contrôleur ?",
+      "options": ["@GetMapping", "@PostMapping", "@RequestMapping", "@Transactional"],
+      "answer": [0, 1, 2],
+      "explanation": "@GetMapping, @PostMapping, @PutMapping, @DeleteMapping, @PatchMapping et le générique @RequestMapping lient toutes des routes HTTP. @Transactional gère les transactions, pas le routage."
+    },
+    {
+      "id": "s15",
+      "type": "mcq",
+      "question": "Quelle annotation extrait une valeur de l'URI comme `/users/{id}` ?",
+      "options": ["@RequestParam", "@PathVariable", "@RequestBody", "@RequestHeader"],
+      "answer": 1,
+      "explanation": "`@PathVariable` lie les segments du chemin. `@RequestParam` lit les paramètres de la query string ; `@RequestBody` lie le corps JSON ; `@RequestHeader` lie un en-tête HTTP."
+    },
+    {
+      "id": "s16",
+      "type": "truefalse",
+      "question": "Étendre `JpaRepository<User, Long>` vous donne automatiquement findAll, findById, save, delete et bien d'autres méthodes sans écrire de code.",
+      "answer": true,
+      "explanation": "JpaRepository hérite de CrudRepository et PagingAndSortingRepository, fournissant CRUD, pagination, tri et flush par défaut."
+    },
+    {
+      "id": "s17",
+      "type": "mcq",
+      "question": "Quel est le rôle de `@Query` sur une méthode de repository Spring Data ?",
+      "options": [
+        "Déclarer une route HTTP",
+        "Définir une requête JPQL ou SQL native personnalisée, optionnellement avec des paramètres liés via @Param",
+        "Marquer une requête comme cachée",
+        "Générer une migration Liquibase"
+      ],
+      "answer": 1,
+      "explanation": "`@Query(\"SELECT u FROM User u WHERE u.email = :email\")` définit un JPQL explicite (ou `nativeQuery=true` pour SQL). Les paramètres sont liés par nom avec `@Param`."
+    },
+    {
+      "id": "s18",
+      "type": "mcq",
+      "question": "Par défaut, quand Spring effectue-t-il un rollback d'une méthode `@Transactional` ?",
+      "options": [
+        "Uniquement sur les exceptions checked",
+        "Uniquement sur les RuntimeException ou Error (exceptions unchecked)",
+        "Sur toute valeur de retour autre que null",
+        "Jamais — vous devez appeler entityManager.rollback() manuellement"
+      ],
+      "answer": 1,
+      "explanation": "Le rollback par défaut se fait sur les exceptions unchecked (RuntimeException + Error). Pour rollback sur une exception checked, utilisez `@Transactional(rollbackFor = Exception.class)`."
+    },
+    {
+      "id": "s19",
+      "type": "mcq",
+      "question": "Quelle propagation SUSPEND toujours la transaction existante et démarre une nouvelle ?",
+      "options": [
+        "Propagation.REQUIRED",
+        "Propagation.REQUIRES_NEW",
+        "Propagation.SUPPORTS",
+        "Propagation.MANDATORY"
+      ],
+      "answer": 1,
+      "explanation": "REQUIRES_NEW démarre toujours une nouvelle transaction physique, suspendant toute transaction existante. Utile pour l'audit/logging qui doit se committer indépendamment."
+    },
+    {
+      "id": "s20",
+      "type": "truefalse",
+      "question": "Marquer une transaction `readOnly = true` est juste une indication et n'affecte jamais les performances.",
+      "answer": false,
+      "explanation": "C'est plus qu'une indication : cela permet au driver JDBC / au provider JPA de sauter le dirty-checking et le flush, peut activer des connexions JDBC en lecture seule / des réplicas, et signale l'intention aux autres développeurs."
+    },
+    {
+      "id": "s21",
+      "type": "open",
+      "question": "Comparez le verrouillage optimiste et pessimiste en JPA. Quand choisiriez-vous chacun ?",
+      "modelAnswer": "Le verrouillage optimiste ajoute un champ `@Version` qui est auto-incrémenté à chaque update. Deux transactions peuvent lire la même ligne en concurrence ; celle qui se commit en second voit un mismatch de version et lève `OptimisticLockException` — l'application réessaye typiquement. Idéal pour les scénarios à faible contention ; aucun verrou DB n'est tenu. Le verrouillage pessimiste acquiert un véritable verrou de base de données avec `LockModeType.PESSIMISTIC_READ/WRITE` (ex. `entityManager.find(Order.class, id, PESSIMISTIC_WRITE)`). Les autres transactions sont bloquées ou échouent jusqu'à ce que le verrou soit relâché. Idéal pour la haute contention ou les courtes sections critiques où les conflits sont très probables. Compromis : optimiste = meilleur débit, retries occasionnels ; pessimiste = exclusivité garantie mais plus de blocage et risque de deadlock.",
+      "keyPoints": ["@Version déclenche OptimisticLockException", "Pessimiste = vrai verrou DB (LockModeType.PESSIMISTIC_WRITE)", "Optimiste idéal pour faible contention", "Pessimiste pour haute contention / opérations financières", "Compromis débit vs blocage"]
+    },
+    {
+      "id": "s22",
+      "type": "mcq",
+      "question": "Quelle annotation active la configuration Spring Security pour une application ?",
+      "options": ["@EnableWebMvc", "@EnableAutoConfiguration", "@EnableWebSecurity", "@SpringBootSecurity"],
+      "answer": 2,
+      "explanation": "`@EnableWebSecurity` (combiné avec un bean `SecurityFilterChain` ou `WebSecurityConfigurerAdapter` dans les anciennes versions) intègre Spring Security dans l'application."
+    },
+    {
+      "id": "s23",
+      "type": "mcq",
+      "question": "Quelle interface implémentez-vous pour charger un utilisateur depuis votre base de données pour Spring Security ?",
+      "options": ["UserDetails", "UserDetailsService", "AuthenticationProvider", "PasswordEncoder"],
+      "answer": 1,
+      "explanation": "`UserDetailsService.loadUserByUsername(username)` retourne un `UserDetails`. Spring Security l'appelle pendant l'authentification."
+    },
+    {
+      "id": "s24",
+      "type": "mcq",
+      "question": "Quel password encoder est recommandé par Spring Security aujourd'hui ?",
+      "options": ["MD5", "SHA-1", "BCryptPasswordEncoder", "NoOpPasswordEncoder"],
+      "answer": 2,
+      "explanation": "`BCryptPasswordEncoder` (ou Argon2/PBKDF2) — fort, salé, lent intentionnellement. MD5/SHA-1 sont non sécurisés pour les mots de passe ; NoOpPasswordEncoder est uniquement pour les tests."
+    },
+    {
+      "id": "s25",
+      "type": "multi",
+      "question": "Quelles annotations imposent des contrôles de rôles/permissions au niveau méthode ?",
+      "options": ["@PreAuthorize", "@Secured", "@RolesAllowed", "@RequestMapping"],
+      "answer": [0, 1, 2],
+      "explanation": "@PreAuthorize (SpEL, expressions complètes), @Secured (rôles simples) et @RolesAllowed (JSR-250) imposent tous une autorisation au niveau méthode. @RequestMapping est pour le routage."
+    },
+    {
+      "id": "s26",
+      "type": "open",
+      "question": "Décrivez un flux d'authentification JWT typique dans une API REST Spring Boot.",
+      "modelAnswer": "1) Le client POST ses credentials sur `/login`. 2) Le serveur authentifie via AuthenticationManager + UserDetailsService + PasswordEncoder. 3) En cas de succès, le serveur construit un JWT signé (header.payload.signature) contenant le username et les autorités, ex. `Jwts.builder().setSubject(...).signWith(HS256, secret).compact()`, et le retourne. 4) Le client stocke le token (l'en-tête Authorization: Bearer est préféré) et l'envoie à chaque requête suivante. 5) Un filtre personnalisé (`JwtAuthenticationFilter extends OncePerRequestFilter`) intercepte chaque requête, extrait le token de l'en-tête Authorization, valide la signature et l'expiration, charge les UserDetails, construit un `UsernamePasswordAuthenticationToken` et le stocke dans le SecurityContextHolder. 6) La requête atteint le contrôleur entièrement authentifiée. Le filtre est enregistré avec `http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)`. Stateless — pas de session.",
+      "keyPoints": ["Login → JWT signé", "En-tête Bearer à chaque requête", "OncePerRequestFilter valide le token", "SecurityContextHolder défini par requête", "Stateless, pas de session", "addFilterBefore"]
+    },
+    {
+      "id": "s27",
+      "type": "mcq",
+      "question": "Pourquoi étendre `OncePerRequestFilter` pour un filtre JWT ?",
+      "options": [
+        "Parce qu'il est asynchrone",
+        "Il garantit que la logique du filtre s'exécute au plus une fois par requête HTTP, même avec des forwards/dispatches internes",
+        "Il chiffre le corps de la requête",
+        "Il ajoute la protection CSRF automatiquement"
+      ],
+      "answer": 1,
+      "explanation": "OncePerRequestFilter garantit que le filtre n'est exécuté qu'une fois par requête, évitant le double traitement sur les forwards internes du dispatcher — exactement ce dont la validation JWT a besoin."
+    },
+    {
+      "id": "s28",
+      "type": "mcq",
+      "question": "Où un JWT devrait-il être stocké de préférence côté client pour une API REST ?",
+      "options": [
+        "Dans une variable JavaScript publique",
+        "Dans l'en-tête HTTP Authorization sous la forme `Bearer <token>` (ou dans un cookie HttpOnly + Secure)",
+        "Dans le localStorage en clair sans protection",
+        "Dans un champ de formulaire caché sur chaque page"
+      ],
+      "answer": 1,
+      "explanation": "Le standard est `Authorization: Bearer <jwt>` pour les API REST. Les cookies HttpOnly + Secure sont aussi acceptables. Le localStorage en clair est vulnérable au XSS."
+    },
+    {
+      "id": "s29",
+      "type": "mcq",
+      "question": "À quoi sert `@RestControllerAdvice` ?",
+      "options": [
+        "Définir un repository JPA",
+        "Centraliser la gestion d'exceptions et la mise en forme des réponses sur tous les contrôleurs via des méthodes @ExceptionHandler",
+        "Configurer Spring Security",
+        "Cacher les réponses HTTP"
+      ],
+      "answer": 1,
+      "explanation": "`@RestControllerAdvice` (= @ControllerAdvice + @ResponseBody) permet de définir des méthodes @ExceptionHandler globales qui transforment les exceptions en réponses JSON d'erreur structurées pour chaque contrôleur."
+    },
+    {
+      "id": "s30",
+      "type": "open",
+      "question": "Comment construire une réponse d'erreur propre pour une 'ResourceNotFoundException' personnalisée ?",
+      "modelAnswer": "1) Créer l'exception (`class ResourceNotFoundException extends RuntimeException`) et optionnellement l'annoter avec `@ResponseStatus(HttpStatus.NOT_FOUND)`. 2) Définir un DTO `ErrorResponse(timestamp, status, error, message, path)`. 3) Dans une classe `@RestControllerAdvice`, déclarer `@ExceptionHandler(ResourceNotFoundException.class)` qui construit le DTO et retourne `ResponseEntity.status(404).body(dto)`. 4) Optionnellement ajouter un `@ExceptionHandler(Exception.class)` générique retournant 500 pour éviter de fuiter les stack traces. Toujours utiliser une forme JSON cohérente pour que le client puisse parser les erreurs uniformément.",
+      "keyPoints": ["Exception personnalisée", "DTO ErrorResponse", "@RestControllerAdvice + @ExceptionHandler", "Forme JSON cohérente", "Raccourci @ResponseStatus"]
+    },
+    {
+      "id": "s31",
+      "type": "mcq",
+      "question": "Quelle annotation Mockito injecte les mocks dans la classe testée ?",
+      "options": ["@Mock", "@InjectMocks", "@Spy", "@Captor"],
+      "answer": 1,
+      "explanation": "`@Mock` crée un mock d'une dépendance. `@InjectMocks` instancie la classe sous test et injecte tous les champs @Mock dedans (injection par constructeur, setter ou champ)."
+    },
+    {
+      "id": "s32",
+      "type": "mcq",
+      "question": "Quelle annotation exécute une méthode AVANT chaque test en JUnit 5 ?",
+      "options": ["@Before", "@BeforeAll", "@BeforeEach", "@Setup"],
+      "answer": 2,
+      "explanation": "JUnit 5 utilise `@BeforeEach` (par test) et `@BeforeAll` (une fois pour la classe). Le legacy `@Before` appartient à JUnit 4."
+    },
+    {
+      "id": "s33",
+      "type": "mcq",
+      "question": "Quelle annotation charge le contexte Spring COMPLET pour un test d'intégration ?",
+      "options": ["@WebMvcTest", "@DataJpaTest", "@SpringBootTest", "@MockBean"],
+      "answer": 2,
+      "explanation": "`@SpringBootTest` démarre le contexte entier. Les tests de slice comme `@WebMvcTest` (contrôleurs uniquement) et `@DataJpaTest` (couche JPA + H2) sont plus rapides mais plus ciblés."
+    },
+    {
+      "id": "s34",
+      "type": "mcq",
+      "question": "Que permet de faire `MockMvc` ?",
+      "options": [
+        "Mocker une base de données",
+        "Simuler des requêtes HTTP contre vos contrôleurs sans démarrer un vrai serveur",
+        "Remplacer BeanValidation",
+        "Générer la documentation Swagger"
+      ],
+      "answer": 1,
+      "explanation": "MockMvc dispatche les requêtes à travers l'infrastructure Spring MVC en mémoire : `mockMvc.perform(get(\"/users/1\")).andExpect(status().isOk()).andExpect(jsonPath(\"$.name\").value(...))`."
+    },
+    {
+      "id": "s35",
+      "type": "mcq",
+      "question": "Comment recevez-vous un fichier uploadé dans un contrôleur Spring ?",
+      "options": [
+        "@RequestBody File file",
+        "@RequestParam(\"file\") MultipartFile file",
+        "@PathVariable MultipartFile file",
+        "@Autowired MultipartResolver file"
+      ],
+      "answer": 1,
+      "explanation": "Utilisez `@RequestParam(\"file\") MultipartFile file` pour un upload `multipart/form-data`, puis `file.getOriginalFilename()`, `file.getInputStream()`, etc."
+    },
+    {
+      "id": "s36",
+      "type": "mcq",
+      "question": "Quelle bibliothèque est couramment utilisée dans Spring Boot pour générer des fichiers Excel (.xls / .xlsx) ?",
+      "options": ["iText", "Apache POI", "OpenCSV", "Liquibase"],
+      "answer": 1,
+      "explanation": "Apache POI gère Excel via XSSFWorkbook (xlsx) et HSSFWorkbook (xls). iText est pour PDF, OpenCSV pour CSV."
+    },
+    {
+      "id": "s37",
+      "type": "mcq",
+      "question": "Quelle bibliothèque est le standard de fait pour générer des PDF en Java/Spring Boot ?",
+      "options": ["Apache POI", "iText", "Jackson", "Logback"],
+      "answer": 1,
+      "explanation": "iText (ou son fork open-source OpenPDF) construit des PDF programmatiquement avec `Document`, `Paragraph`, `PdfWriter`, des tables et des images."
+    },
+    {
+      "id": "s38",
+      "type": "mcq",
+      "question": "Quelle paire d'annotations active l'exécution asynchrone de méthodes dans Spring ?",
+      "options": [
+        "@EnableAsync sur une classe de config + @Async sur la méthode",
+        "@EnableScheduling + @Scheduled",
+        "@Transactional + @Async",
+        "@Component + @Async"
+      ],
+      "answer": 0,
+      "explanation": "`@EnableAsync` active le support async ; `@Async` marque les méthodes pour qu'elles s'exécutent dans un thread séparé (retournant void ou un `CompletableFuture`)."
+    },
+    {
+      "id": "s39",
+      "type": "truefalse",
+      "question": "`@Async` fonctionne sur les méthodes appelées depuis l'intérieur de la même classe via `this.method()`.",
+      "answer": false,
+      "explanation": "Comme @Transactional, @Async repose sur un proxy Spring. Une auto-invocation (`this.foo()`) court-circuite le proxy, donc l'appel s'exécute de façon synchrone. Injectez le bean ou séparez en composant distinct."
+    },
+    {
+      "id": "s40",
+      "type": "mcq",
+      "question": "Quelle expression déclenche `@Scheduled` pour s'exécuter chaque jour ouvré à 8h ?",
+      "options": [
+        "fixedRate = 8000",
+        "fixedDelay = 8000",
+        "cron = \"0 0 8 * * MON-FRI\"",
+        "initialDelay = 8000"
+      ],
+      "answer": 2,
+      "explanation": "`@Scheduled(cron = \"0 0 8 * * MON-FRI\")` s'exécute à 08:00 du lundi au vendredi. N'oubliez pas `@EnableScheduling`."
+    },
+    {
+      "id": "s41",
+      "type": "mcq",
+      "question": "Que fait `@Cacheable(\"products\")` sur une méthode de service ?",
+      "options": [
+        "Désactive le cache JPA",
+        "Stocke la valeur retournée par la méthode dans le cache nommé, indexée par les arguments — les appels suivants avec les mêmes args sautent le corps et retournent la valeur cachée",
+        "Cache les réponses HTTP côté client",
+        "Force la ré-exécution de la méthode à chaque appel"
+      ],
+      "answer": 1,
+      "explanation": "`@Cacheable` cache les résultats par clé d'argument. `@CacheEvict` supprime les entrées ; `@CachePut` exécute toujours la méthode mais met à jour le cache. À activer avec `@EnableCaching` et un CacheManager (Caffeine, EHCache, Redis)."
+    },
+    {
+      "id": "s42",
+      "type": "open",
+      "question": "Qu'est-ce que la stack ELK et pourquoi est-elle utilisée avec les microservices ?",
+      "modelAnswer": "ELK = Elasticsearch + Logstash + Kibana (souvent plus Beats/Filebeat). Logstash (ou Filebeat) collecte et expédie les logs depuis chaque microservice. Elasticsearch les indexe pour recherche et agrégation rapides. Kibana fournit dashboards, requêtes et alerting au-dessus. Avec de nombreux services distribués, vous ne pouvez pas faire un tail des fichiers de log individuels — ELK donne une vue centralisée, recherchable, corrélée (typiquement avec un id de corrélation/trace propagé entre les appels), ce qui est essentiel pour le débogage et l'observabilité.",
+      "keyPoints": ["Elasticsearch = index + recherche", "Logstash/Beats = expédition de logs", "Kibana = visualisation", "Logging centralisé pour systèmes distribués", "Id de corrélation entre services"]
+    },
+    {
+      "id": "s43",
+      "type": "mcq",
+      "question": "Qu'est-ce qu'une architecture microservices, en une phrase ?",
+      "options": [
+        "Une application monolithique découpée en modules mais déployée ensemble",
+        "Un style où l'application est composée de petits services indépendamment déployables qui communiquent sur le réseau, chacun possédant ses données",
+        "Un pattern frontend basé sur les web components",
+        "Un remplacement serverless de Spring Boot"
+      ],
+      "answer": 1,
+      "explanation": "Microservices = petits services indépendamment déployables avec leur propre stockage de données, communiquant via REST/messaging."
+    },
+    {
+      "id": "s44",
+      "type": "mcq",
+      "question": "Qu'est-ce qu'Eureka dans l'écosystème Spring Cloud / Netflix OSS ?",
+      "options": [
+        "Un API Gateway",
+        "Un serveur de configuration",
+        "Un Service Discovery / registre où les microservices s'enregistrent et se découvrent mutuellement",
+        "Un circuit breaker"
+      ],
+      "answer": 2,
+      "explanation": "Eureka Server est un registre de services. Chaque service s'enregistre au démarrage ; les clients interrogent Eureka pour localiser dynamiquement les instances, avec health checks et auto-désenregistrement."
+    },
+    {
+      "id": "s45",
+      "type": "mcq",
+      "question": "Quel est le rôle de Spring Cloud Gateway ?",
+      "options": [
+        "Il remplace Spring Security",
+        "C'est un API Gateway qui centralise le routage, les filtres, la sécurité, le rate limiting et la transformation de requêtes pour tous les microservices",
+        "C'est une base de données relationnelle",
+        "Il génère automatiquement des tokens JWT"
+      ],
+      "answer": 1,
+      "explanation": "Spring Cloud Gateway est l'API Gateway moderne : un point d'entrée unique qui gère le routage, les prédicats, les filtres (auth, logging, réécriture), CORS, rate limiting, etc."
+    },
+    {
+      "id": "s46",
+      "type": "mcq",
+      "question": "Comparé à RestTemplate, Feign Client est...",
+      "options": [
+        "Un client HTTP impératif de plus bas niveau",
+        "Un client HTTP déclaratif : vous définissez une interface annotée @FeignClient et Spring génère l'implémentation",
+        "Utilisable uniquement à partir de Spring 6.2+",
+        "Réactif (retourne Mono/Flux)"
+      ],
+      "answer": 1,
+      "explanation": "Feign est déclaratif — vous décrivez l'API comme une interface Java avec @FeignClient + @GetMapping etc., et Spring construit le proxy. Il s'intègre aussi avec le load balancing et les circuit breakers."
+    },
+    {
+      "id": "s47",
+      "type": "mcq",
+      "question": "Quelle bibliothèque est le remplaçant moderne et recommandé d'Hystrix comme circuit breaker ?",
+      "options": ["Resilience4j", "Ribbon", "Zuul", "Eureka"],
+      "answer": 0,
+      "explanation": "Hystrix est en mode maintenance. Resilience4j est la bibliothèque de circuit breaker légère, modulaire, moderne utilisée avec Spring Cloud Circuit Breaker."
+    },
+    {
+      "id": "s48",
+      "type": "open",
+      "question": "Expliquez les trois états d'un Circuit Breaker et pourquoi ce pattern est important.",
+      "modelAnswer": "États : CLOSED — les appels passent normalement ; les échecs sont comptés. OPEN — une fois qu'un seuil d'échecs est dépassé, les appels échouent vite (ou utilisent un fallback) sans contacter le service distant pendant une 'wait duration'. HALF-OPEN — après l'attente, quelques appels d'essai sont autorisés ; s'ils réussissent le breaker repasse à CLOSED, sinon il se rouvre. Pourquoi c'est important : dans un système distribué, une dépendance lente ou défaillante peut saturer les threads et faire cascader la panne sur toute la plateforme. Le breaker isole la panne, libère les ressources, laisse la dépendance récupérer, et donne à l'utilisateur un fallback gracieux.",
+      "keyPoints": ["CLOSED / OPEN / HALF-OPEN", "Échec rapide + fallback", "Évite les pannes en cascade", "Récupération auto via appels d'essai half-open"]
+    },
+    {
+      "id": "s49",
+      "type": "mcq",
+      "question": "Quel est le rôle de Spring Cloud Config Server ?",
+      "options": [
+        "Stocker les mots de passe utilisateur",
+        "Centraliser la configuration (ex. sur Git) pour que chaque microservice récupère son application.yml depuis une source unique — supportant le rafraîchissement sans redéploiement",
+        "Générer les migrations de base de données",
+        "Exécuter des tâches planifiées"
+      ],
+      "answer": 1,
+      "explanation": "Config Server externalise et centralise la configuration (souvent backée par Git). Combiné avec `@RefreshScope` et Spring Cloud Bus, les beans peuvent être rafraîchis sans redéploiement."
+    },
+    {
+      "id": "s50",
+      "type": "mcq",
+      "question": "Quel broker est le plus souvent utilisé pour la communication asynchrone Event-Driven entre microservices Spring Boot ?",
+      "options": ["JDBC", "Kafka (ou RabbitMQ)", "FTP", "SMTP"],
+      "answer": 1,
+      "explanation": "Kafka et RabbitMQ sont les choix dominants. Kafka excelle pour les flux d'événements à haut débit, partitionnés, persistés ; RabbitMQ pour le routage flexible et les queues traditionnelles."
+    },
+    {
+      "id": "s51",
+      "type": "mcq",
+      "question": "Dans Kafka, qu'est-ce qu'un 'topic' ?",
+      "options": [
+        "Une instance de consommateur",
+        "Un canal logique de messages, divisé en partitions pour le parallélisme et l'ordre",
+        "Un format de sérialisation",
+        "Un rôle de sécurité"
+      ],
+      "answer": 1,
+      "explanation": "Un topic est un canal logique nommé. Il est divisé en partitions : chaque partition est un log ordonné en append-only ; les consommateurs du même groupe se partagent les partitions pour traitement parallèle."
+    },
+    {
+      "id": "s52",
+      "type": "mcq",
+      "question": "Quelle annotation Spring marque une méthode comme consommateur de messages Kafka ?",
+      "options": ["@JmsListener", "@KafkaListener", "@RabbitListener", "@EventListener"],
+      "answer": 1,
+      "explanation": "`@KafkaListener(topics = \"my-topic\", groupId = \"...\")` enregistre la méthode pour recevoir les messages du topic donné."
+    },
+    {
+      "id": "s53",
+      "type": "open",
+      "question": "Décrivez le modèle standard Reader → Processor → Writer dans Spring Batch.",
+      "modelAnswer": "Un Job Spring Batch est composé d'un ou plusieurs Steps. Le Step chunk-oriented classique a trois composants exécutés en boucle, transactionnellement par chunk : ItemReader lit un item à la fois depuis une source (base de données via JdbcPagingItemReader, fichier via FlatFileItemReader, JSON, JPA...). ItemProcessor (optionnel) transforme ou filtre chaque item (retourner null le saute). ItemWriter écrit un chunk entier à la fois vers sa destination (DB, fichier, queue). Le Step est configuré avec `.<I,O>chunk(N)` pour que tous les N items forment un batch transactionnel — commit en cas de succès, rollback en cas d'échec. Batch garde les métadonnées d'exécution (statut, points de redémarrage, compteurs skip/retry) dans son propre JobRepository, permettant restart, restart-from-failure et reruns idempotents.",
+      "keyPoints": ["Job = Steps", "Reader / Processor / Writer", "Chunk-oriented + transaction par chunk", "JobRepository persiste l'état", "Restart / skip / retry"]
+    },
+    {
+      "id": "s54",
+      "type": "mcq",
+      "question": "Quelle annotation Spring active Spring Batch ?",
+      "options": ["@EnableScheduling", "@EnableAsync", "@EnableBatchProcessing", "@EnableTransactionManagement"],
+      "answer": 2,
+      "explanation": "`@EnableBatchProcessing` (souvent sur une classe @Configuration) câble les Job/Step builders, le JobRepository et le JobLauncher."
+    },
+    {
+      "id": "s55",
+      "type": "mcq",
+      "question": "À quoi le Criteria API de JPA est-il le mieux adapté ?",
+      "options": [
+        "Aux requêtes statiques d'une ligne",
+        "À la construction DYNAMIQUE et type-safe de requêtes — construire les clauses WHERE programmatiquement basées sur des filtres optionnels",
+        "Remplacer JDBC complètement",
+        "Générer des endpoints REST"
+      ],
+      "answer": 1,
+      "explanation": "Le Criteria API (CriteriaBuilder, CriteriaQuery, Root, Predicate) construit les requêtes programmatiquement. Il brille pour les formulaires de recherche dynamiques où les filtres sont optionnels et où vous ne voulez pas concaténer des chaînes JPQL."
+    },
+    {
+      "id": "s56",
+      "type": "mcq",
+      "question": "Quel client est l'alternative moderne, non-bloquante et réactive à RestTemplate ?",
+      "options": ["Feign", "WebClient (Spring WebFlux)", "Apache HttpClient", "JdbcTemplate"],
+      "answer": 1,
+      "explanation": "WebClient retourne `Mono`/`Flux` et est non-bloquant. RestTemplate est maintenant en mode maintenance ; WebClient est recommandé même dans les apps MVC pour les appels sortants."
+    },
+    {
+      "id": "s57",
+      "type": "multi",
+      "question": "Les façons courantes de versionner une API REST incluent :",
+      "options": [
+        "Versionnement par URI (/api/v1/products)",
+        "Versionnement par en-tête (X-API-VERSION: 1)",
+        "Paramètre de requête (/products?version=1)",
+        "Renommer le fichier JAR"
+      ],
+      "answer": [0, 1, 2],
+      "explanation": "Versionnement par URI, en-tête et paramètre de query sont tous valides. URI est le plus courant car explicite et cache-friendly."
+    },
+    {
+      "id": "s58",
+      "type": "mcq",
+      "question": "Quelle ligne dans un Dockerfile définit la JVM comme point d'entrée d'une image Spring Boot ?",
+      "options": [
+        "RUN java -jar app.jar",
+        "ENTRYPOINT [\"java\", \"-jar\", \"app.jar\"]",
+        "CMD java app.jar start",
+        "EXPOSE java -jar app.jar"
+      ],
+      "answer": 1,
+      "explanation": "`ENTRYPOINT [\"java\",\"-jar\",\"app.jar\"]` est la façon canonique. `EXPOSE` documente seulement le port, `RUN` s'exécute au build, `CMD` fournit les args par défaut."
+    },
+    {
+      "id": "s59",
+      "type": "mcq",
+      "question": "Que fait Liquibase dans un projet Spring Boot ?",
+      "options": [
+        "Cache les réponses HTTP",
+        "Versionne et applique les changements de schéma de base de données via un changelog (XML/YAML/SQL), automatiquement au démarrage",
+        "Génère la documentation Swagger",
+        "Remplace JPA"
+      ],
+      "answer": 1,
+      "explanation": "Liquibase suit les changements de schéma dans un changelog de changeSets (avec id et auteur). Au démarrage, Spring Boot exécute les changeSets en attente, gardant la DB de chaque environnement dans un état connu et reproductible."
+    },
+    {
+      "id": "s60",
+      "type": "open",
+      "question": "Listez les couches typiques d'une application CRUD Spring Boot propre et la responsabilité de chacune.",
+      "modelAnswer": "1) Entity / Model (@Entity) — objets de domaine mappés aux tables DB. 2) Repository (interface étendant JpaRepository) — accès aux données pur, pas de logique métier. 3) DTO — objets de transfert exposés vers / reçus du monde extérieur ; découplent l'API des entités. 4) Mapper (manuel ou MapStruct) — conversion entre DTO et Entity. 5) Service (@Service) — logique métier, validation, orchestration, transactions (@Transactional). 6) Controller (@RestController) — couche HTTP : routage, sérialisation requête/réponse, codes de statut ; délègue le travail au Service. 7) Exception handler (@RestControllerAdvice) — réponses d'erreur uniformes. 8) Configuration / Security — beans @Configuration, SecurityFilterChain, etc. Cette séparation impose la responsabilité unique, la testabilité et l'évolution facile.",
+      "keyPoints": ["Entity / Repository / DTO / Service / Controller", "Service détient la logique métier + @Transactional", "Controller léger", "DTO découple l'API de la DB", "@RestControllerAdvice pour erreurs globales"]
+    },
+    {
+      "id": "s61",
+      "type": "truefalse",
+      "question": "`@Transactional` de Spring exige que la méthode soit publique en mode (proxy) par défaut.",
+      "answer": true,
+      "explanation": "Les transactions basées sur proxy de Spring n'interceptent que les méthodes publiques. Les méthodes non-publiques sont silencieusement ignorées sauf si vous passez au weaving AspectJ."
+    },
+    {
+      "id": "s62",
+      "type": "mcq",
+      "question": "Quelle annotation Spring Boot combine @Configuration, @ComponentScan et @EnableAutoConfiguration ?",
+      "options": ["@SpringBootConfiguration", "@SpringBootApplication", "@EnableSpringBoot", "@ComponentScan"],
+      "answer": 1,
+      "explanation": "`@SpringBootApplication` est la méta-annotation placée sur la classe principale. Elle inclut @SpringBootConfiguration (un @Configuration), @EnableAutoConfiguration et @ComponentScan."
+    },
+    {
+      "id": "s63",
+      "type": "mcq",
+      "question": "Quelle dépendance fournit la documentation Swagger / OpenAPI dans les applications Spring Boot 3 modernes ?",
+      "options": ["springfox-swagger2", "springdoc-openapi-starter-webmvc-ui", "spring-boot-starter-swagger", "io.swagger:swagger-core"],
+      "answer": 1,
+      "explanation": "Springfox n'est plus maintenu et incompatible avec Spring Boot 3. Le standard actuel est `springdoc-openapi-starter-webmvc-ui`, qui expose `/swagger-ui.html` et `/v3/api-docs`."
+    },
+    {
+      "id": "s64",
+      "type": "mcq",
+      "question": "Que fait l'annotation @LoadBalanced sur un bean RestTemplate dans Spring Cloud ?",
+      "options": [
+        "Elle active le cache des réponses HTTP",
+        "Elle active le load balancing côté client : les requêtes vers un nom de service enregistré sont dispatchées vers une des instances disponibles découvertes (ex. via Eureka)",
+        "Elle chiffre le trafic HTTP",
+        "Elle réessaye les requêtes échouées"
+      ],
+      "answer": 1,
+      "explanation": "@LoadBalanced enveloppe le RestTemplate (ou WebClient.Builder) pour que les URLs comme `http://user-service/...` soient résolues via le discovery client et balancées entre les instances par Spring Cloud LoadBalancer."
+    },
+    {
+      "id": "s65",
+      "type": "open",
+      "question": "Quels sont les principaux avantages ET inconvénients d'une architecture microservices ?",
+      "modelAnswer": "Avantages : scalabilité indépendante par service ; déploiements isolés et plus rapides ; hétérogénéité technologique (chaque équipe choisit sa stack) ; résilience (la panne d'un service ne doit pas faire tomber tout le système si circuit breakers et bulkheads sont en place) ; frontières de domaine claires ; les équipes peuvent travailler de façon autonome. Inconvénients : complexité opérationnelle significative (Docker/K8s, observabilité, CI/CD par service) ; les transactions distribuées et la cohérence éventuelle sont difficiles ; le débogage entre services nécessite des ids de corrélation et un logging centralisé (ELK) + tracing distribué (Zipkin / Sleuth / OpenTelemetry) ; surcoût réseau et coûts de sérialisation ; la sécurité doit être imposée partout (gateway + JWT + auth service-à-service). Les microservices ne valent le coût que si le domaine et la taille de l'équipe justifient la surcharge — commencez par un monolithe bien modularisé sinon.",
+      "keyPoints": ["+ scaling & déploiement indépendants", "+ résilience, hétérogénéité tech, autonomie d'équipe", "− complexité opérationnelle", "− transactions distribuées, cohérence éventuelle", "− débogage nécessite tracing + ELK", "− sécurité partout"]
+    }
+  ]
+}
