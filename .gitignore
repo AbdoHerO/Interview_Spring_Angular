@@ -16,3 +16,11 @@ desktop.ini
 .vscode/
 *.swp
 *.swo
+
+ai-service/venv
+ai-service/.venv
+ai-service/__pycache__/
+ai-service/*.pyc
+ai-service/app/__pycache__/
+*.pyc
+ai-service/data
