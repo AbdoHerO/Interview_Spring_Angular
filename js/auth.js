@@ -63,9 +63,11 @@
       } catch {
         this.serverAvailable = false;
       }
-      // Server unreachable -> client-side check from APP_CONFIG
-      const cfg = window.APP_CONFIG.auth;
-      if (user === cfg.username && pass === cfg.password) {
+      // Server unreachable -> client-side check from APP_CONFIG.
+      // The truthiness guards matter: config.js now ships empty credentials,
+      // and without them submitting two empty strings would match and log in.
+      const cfg = (window.APP_CONFIG && window.APP_CONFIG.auth) || {};
+      if (cfg.username && cfg.password && user === cfg.username && pass === cfg.password) {
         localStorage.setItem(LOCAL_FLAG, 'ok');
         return true;
       }

@@ -1,0 +1,43 @@
+# Keep credentials, VCS history and dev-only material out of the web image.
+#
+# Note what is NOT excluded: files/, tests/ and js/ all ship — they are the
+# content the app serves.
+
+.git
+.gitattributes
+.gitignore
+
+# Real credentials. The entrypoint renders .env at container start instead; if
+# it were copied in, an image layer would carry the OpenAI key.
+.env
+.env.*
+ai-service/.env
+
+# The AI service is a separate image with its own build context (./ai-service).
+# Excluding it here keeps the web build context small and stops the Python
+# virtualenvs — hundreds of megabytes — from being sent to the daemon.
+ai-service/
+
+# Local runtime data: chat.json, sessions, the embedded Qdrant store.
+data/
+
+# Dev-only helpers and documentation. DOCUMENTATION.md in particular describes
+# the auth flow and the internal-token design.
+serve.ps1
+DOCUMENTATION.md
+DEPLOYMENT.md
+README.md
+
+Dockerfile
+.dockerignore
+docker-compose.yml
+Jenkinsfile
+
+*.log
+*.cache
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+__pycache__/
+*.pyc

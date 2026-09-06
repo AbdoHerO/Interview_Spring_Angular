@@ -1,0 +1,21 @@
+# The Dockerfile only COPYs requirements.txt and app/, but the whole context is
+# still uploaded to the Docker daemon first. Both virtualenvs here are hundreds
+# of megabytes, and on a small VPS that upload dominates the build.
+
+venv/
+.venv/
+__pycache__/
+**/__pycache__/
+*.pyc
+*.pyo
+
+# Secrets: the real keys are injected as environment variables by Compose.
+.env
+
+# Session JSON and the embedded Qdrant store — runtime state, and a volume in
+# production.
+data/
+
+README.md
+docker-compose.yml
+.dockerignore

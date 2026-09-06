@@ -1,8 +1,17 @@
 // Application configuration: sources, credentials, AI settings.
 window.APP_CONFIG = {
+  // Deliberately empty. This file is served to the browser, so anything in it
+  // is readable via view-source by anyone who loads the page — these values
+  // were a published password, not a secret. The real credentials live in .env
+  // and are verified by api.php server-side.
+  //
+  // auth.js consults these only when the server is unreachable (opening
+  // index.html straight from the filesystem, say). Empty means that offline
+  // fallback is unavailable, which is the right trade for a site on the
+  // public internet.
   auth: {
-    username: 'abdohero',          // see .env → APP_USERNAME
-    password: 'ABDOwahna135795',   // see .env → APP_PASSWORD
+    username: '',
+    password: '',
   },
 
   // Each entry maps to a file under ./files/

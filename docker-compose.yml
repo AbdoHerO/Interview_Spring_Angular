@@ -1,0 +1,132 @@
+# Interview Revision Hub — production stack.
+#
+# Run by Jenkins on the VPS. Values come from the .env the pipeline writes from
+# the CloudForge "Deployment Environment File" credential, except HOST_PORT and
+# AI_HOST_PORT, which CloudForge owns and passes in the shell environment.
+#
+#   web    :  Apache/PHP  — the site, api.php, ai_proxy.php   -> 127.0.0.1:8091
+#   ai     :  FastAPI     — interview engine + voice gateway  -> 127.0.0.1:8092
+#   qdrant :  vector DB   — no published port at all
+name: interview-hub
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: interview-hub-web:${IMAGE_TAG:-latest}
+    restart: unless-stopped
+    depends_on:
+      ai:
+        condition: service_started
+    environment:
+      APP_USERNAME: ${APP_USERNAME:?APP_USERNAME is required — the .env file was not written}
+      APP_PASSWORD: ${APP_PASSWORD:?APP_PASSWORD is required}
+      GROQ_API_KEY: ${GROQ_API_KEY:-}
+      GROQ_ENDPOINT: ${GROQ_ENDPOINT:-https://api.groq.com/openai/v1/chat/completions}
+      GROQ_MODEL: ${GROQ_MODEL:-meta-llama/llama-4-scout-17b-16e-instruct}
+      # Server-to-server, over the compose network. The AI service is never
+      # reached from the browser at this address.
+      AI_SERVICE_URL: http://ai:8088
+      INTERNAL_SHARED_SECRET: ${INTERNAL_SHARED_SECRET:?INTERNAL_SHARED_SECRET is required}
+      # The browser opens the voice WebSocket itself, so it needs a public URL.
+      # Deriving it from AI_SERVICE_URL would hand the browser ws://ai:8088,
+      # which resolves to nothing outside Docker.
+      AI_PUBLIC_WS_URL: ${AI_PUBLIC_WS_URL:-}
+      TZ: ${TZ:-Africa/Casablanca}
+    ports:
+      - "127.0.0.1:${HOST_PORT:-8091}:80"
+    volumes:
+      # chat.json and its lock. gitignored in the repo, so this volume is the
+      # only copy of the chat history.
+      - chatdata:/var/www/html/data
+      - sessions:/var/lib/php/sessions
+    networks: [internal]
+    labels:
+      hub.interview.app: interview-hub
+      hub.interview.role: web
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "3" }
+
+  ai:
+    build:
+      context: ./ai-service
+      dockerfile: Dockerfile
+    image: interview-hub-ai:${IMAGE_TAG:-latest}
+    restart: unless-stopped
+    depends_on:
+      qdrant:
+        condition: service_started
+    environment:
+      AI_SERVICE_HOST: 0.0.0.0
+      AI_SERVICE_PORT: "8088"
+      INTERNAL_SHARED_SECRET: ${INTERNAL_SHARED_SECRET:?INTERNAL_SHARED_SECRET is required}
+      # CORS is not what protects this service — the internal token and the
+      # HMAC voice ticket are. This just stops other origins scripting it.
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-https://interview.zincolo.com}
+
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_MODEL: ${OPENAI_MODEL:-gpt-4.1}
+      OPENAI_REALTIME_MODEL: ${OPENAI_REALTIME_MODEL:-gpt-realtime}
+      OPENAI_BASE_URL: ${OPENAI_BASE_URL:-https://api.openai.com/v1}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      ANTHROPIC_MODEL: ${ANTHROPIC_MODEL:-claude-sonnet-4-20250514}
+      GROQ_API_KEY: ${GROQ_API_KEY:-}
+      GROQ_MODEL: ${GROQ_MODEL:-meta-llama/llama-4-scout-17b-16e-instruct}
+      GROQ_BASE_URL: ${GROQ_BASE_URL:-https://api.groq.com/openai/v1}
+      LLM_PROVIDER_PRIORITY: ${LLM_PROVIDER_PRIORITY:-openai,groq}
+
+      VOYAGE_API_KEY: ${VOYAGE_API_KEY:-}
+      VOYAGE_MODEL: ${VOYAGE_MODEL:-voyage-code-3}
+      EMBEDDING_FALLBACK_MODEL: ${EMBEDDING_FALLBACK_MODEL:-text-embedding-3-small}
+
+      # Server mode, not the embedded local path. The collection dimension is
+      # derived from the active embedder at runtime, so no dimension is set here.
+      QDRANT_URL: http://qdrant:6333
+      QDRANT_COLLECTION: ${QDRANT_COLLECTION:-interview_knowledge}
+
+      SESSION_BACKEND: json
+      SESSION_DIR: ./data/sessions
+      MAX_UPLOAD_MB: ${MAX_UPLOAD_MB:-50}
+      TZ: ${TZ:-Africa/Casablanca}
+    ports:
+      # Loopback only. Nginx proxies exactly one public path to it —
+      # /api/voice/ws — because the browser opens that socket directly. Every
+      # other route stays reachable only from the web container.
+      - "127.0.0.1:${AI_HOST_PORT:-8092}:8088"
+    volumes:
+      - aidata:/srv/data
+    networks: [internal]
+    labels:
+      hub.interview.app: interview-hub
+      hub.interview.role: ai
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "3" }
+
+  qdrant:
+    image: qdrant/qdrant:v1.11.3
+    restart: unless-stopped
+    # No ports. Qdrant has no authentication configured, so publishing it even
+    # on loopback would expose the whole knowledge base to anything on the VPS.
+    volumes:
+      - qdrantdata:/qdrant/storage
+    networks: [internal]
+    labels:
+      hub.interview.app: interview-hub
+      hub.interview.role: vectordb
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "3" }
+
+volumes:
+  chatdata:
+  sessions:
+  aidata:
+  qdrantdata:
+
+networks:
+  internal:
+    driver: bridge
+    # Not `internal: true` — the AI service calls OpenAI, Groq and GitHub.

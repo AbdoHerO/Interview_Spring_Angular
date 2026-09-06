@@ -27,8 +27,18 @@ if (is_file($_ENV_FILE)) {
 }
 
 // ---- config ----
-$USERNAME = $_ENV['APP_USERNAME'] ?? 'abdohero';
-$PASSWORD = $_ENV['APP_PASSWORD'] ?? 'ABDOwahna135795';
+// No hardcoded fallback. The previous defaults were committed to a public
+// repository, so a missing or unreadable .env would have silently reopened a
+// login whose password anyone can read in this repo's git history. Failing
+// closed makes a configuration mistake obvious instead of dangerous.
+$USERNAME = (string)($_ENV['APP_USERNAME'] ?? '');
+$PASSWORD = (string)($_ENV['APP_PASSWORD'] ?? '');
+if ($USERNAME === '' || $PASSWORD === '') {
+    http_response_code(503);
+    header('Content-Type: application/json; charset=utf-8');
+    echo json_encode(['error' => 'server not configured: APP_USERNAME and APP_PASSWORD are unset']);
+    exit;
+}
 $GROQ_API_KEY  = $_ENV['GROQ_API_KEY']  ?? '';
 $GROQ_ENDPOINT = $_ENV['GROQ_ENDPOINT'] ?? 'https://api.groq.com/openai/v1/chat/completions';
 $GROQ_MODEL    = $_ENV['GROQ_MODEL']    ?? 'meta-llama/llama-4-scout-17b-16e-instruct';

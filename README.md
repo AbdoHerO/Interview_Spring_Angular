@@ -55,15 +55,25 @@ Right-click `index.html` → **Open with Live Server** (no chat sync; PHP not ex
 
 ## 🔑 Login
 
-| Field | Value |
-|-------|-------|
-| Username | `abdohero` |
-| Password | `ABDOwahna135795` |
+Credentials live in `.env` (gitignored) and are verified server-side by
+`api.php`:
+
+```dotenv
+APP_USERNAME=your-username
+APP_PASSWORD=your-password
+```
+
+There is no hardcoded fallback, and none in `js/config.js` — that file is
+served to the browser, so anything in it is public. When `.env` is missing,
+`api.php` returns 503 rather than accepting a default.
+
+> ⚠️ An earlier version of this README and of `js/config.js` published a real
+> password. It is still in this repository's git history, so that password must
+> be considered compromised anywhere it was reused.
 
 ## 🛠️ Configuration
 
 Edit `js/config.js` to:
-- Change credentials
 - Add/remove sections (point `path` to your `.md` or `.pdf` files in `files/`)
 - Tune the **default** AI system prompt
 - Update the Groq API key / model

@@ -1,5 +1,17 @@
-# Secrets — never commit
+# Secrets — never commit.
+#
+# The bare `.env` rule below only matches the repository root. ai-service/.env
+# holds the OpenAI key and was untracked by luck rather than by rule — one
+# `git add -A` from a different directory would have committed it to a public
+# repository. It is now matched explicitly.
 .env
+ai-service/.env
+.env.production
+.env.local
+
+# The template is documentation and carries no real values.
+!.env.example
+!ai-service/.env.example
 
 # PHP session / lock files
 data/chat.lock
