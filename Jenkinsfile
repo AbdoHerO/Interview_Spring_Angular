@@ -51,8 +51,20 @@ pipeline {
     environment {
         COMPOSE_PROJECT_NAME = 'interview-hub'
         IMAGE_TAG = "b${BUILD_NUMBER}"
-        HEALTH_URL = "http://127.0.0.1:${params.HOST_PORT}/health.php"
-        AI_HEALTH_URL = "http://127.0.0.1:${params.AI_HOST_PORT}/healthz"
+
+        // Every params.* reference below needs its own default, because on the
+        // very first build Jenkins has not yet evaluated the parameters block
+        // above — it queues the job with only the parameters CloudForge itself
+        // supplies. AI_HOST_PORT is not one of those (CloudForge owns exactly
+        // one application port), so on run #1 it is simply absent, and `set -u`
+        // in the Deploy stage turned that into a hard failure.
+        //
+        // Resolving the ports here means every later stage reads one already
+        // defaulted value instead of repeating the fallback.
+        WEB_PORT = "${params.HOST_PORT ?: '8091'}"
+        AI_PORT = "${params.AI_HOST_PORT ?: '8092'}"
+        HEALTH_URL = "http://127.0.0.1:${params.HOST_PORT ?: '8091'}/health.php"
+        AI_HEALTH_URL = "http://127.0.0.1:${params.AI_HOST_PORT ?: '8092'}/healthz"
     }
 
     stages {
@@ -135,11 +147,18 @@ into this Jenkins folder and supplies its id; later runs reuse it.''')
             steps {
                 sh '''
                     set -eu
-                    # HOST_PORT, AI_HOST_PORT and IMAGE_TAG reach Compose through
-                    # the process environment (Jenkins exports build parameters),
-                    # and a shell variable beats the .env file in Compose's
-                    # precedence order.
-                    echo "web -> 127.0.0.1:${HOST_PORT}   ai -> 127.0.0.1:${AI_HOST_PORT}"
+                    # Compose reads these from the process environment, and a
+                    # shell variable beats the .env file in its precedence order
+                    # — which is what keeps the CloudForge-owned port the single
+                    # source of truth for what Nginx proxies to.
+                    #
+                    # Sourced from WEB_PORT/AI_PORT rather than the raw
+                    # parameters: those are already defaulted in the environment
+                    # block, so this stage cannot trip over an unset parameter
+                    # on a first build.
+                    export HOST_PORT="$WEB_PORT"
+                    export AI_HOST_PORT="$AI_PORT"
+                    echo "web -> 127.0.0.1:${WEB_PORT}   ai -> 127.0.0.1:${AI_PORT}"
                     docker compose up -d --remove-orphans
                     docker compose ps
                 '''
@@ -214,7 +233,7 @@ into this Jenkins folder and supplies its id; later runs reuse it.''')
             sh 'rm -f .env'
         }
         success {
-            echo "Deployed interview-hub ${IMAGE_TAG}: web 127.0.0.1:${params.HOST_PORT}, ai 127.0.0.1:${params.AI_HOST_PORT}"
+            echo "Deployed interview-hub ${IMAGE_TAG}: web 127.0.0.1:${WEB_PORT}, ai 127.0.0.1:${AI_PORT}"
         }
     }
 }
