@@ -254,6 +254,12 @@
     room.hidden = false;
     room.innerHTML = `
       <h3>Interview in progress <span class="muted small" id="irh-turns"></span></h3>
+      <div class="row" style="margin-bottom:.6rem">
+        <button type="button" id="irh-voice-toggle" class="voice-launch-btn">
+          <span class="voice-launch-ico"></span> Switch to voice mode
+        </button>
+      </div>
+      <div id="irh-voice-mount" hidden></div>
       <div id="irh-transcript" class="irh-transcript"></div>
       <form id="irh-answer-form" class="irh-answer-form">
         <textarea id="irh-answer" rows="4" placeholder="Type your answer… (Enter to send, Shift+Enter for newline)"></textarea>
@@ -281,6 +287,27 @@
     });
     $('#irh-answer-form').addEventListener('submit', onAnswerSubmit);
     $('#irh-finish').addEventListener('click', onFinish);
+
+    let voiceCtl = null;
+    $('#irh-voice-toggle').addEventListener('click', async () => {
+      if (voiceCtl) {
+        voiceCtl.stop();
+        voiceCtl = null;
+        $('#irh-voice-toggle').innerHTML = '<span class="voice-launch-ico"></span> Switch to voice mode';
+        return;
+      }
+      if (!window.VoiceInterview) { alert('Voice module not loaded'); return; }
+      try {
+        $('#irh-voice-toggle').disabled = true;
+        voiceCtl = await window.VoiceInterview.open(current.session_id, $('#irh-voice-mount'), { debug: false });
+        $('#irh-voice-toggle').innerHTML = '<span class="voice-launch-ico"></span> End voice mode';
+      } catch (e) {
+        console.error(e);
+        alert('Could not start voice: ' + (e.message || e));
+      } finally {
+        $('#irh-voice-toggle').disabled = false;
+      }
+    });
   }
 
   function appendTurn(who, content) {

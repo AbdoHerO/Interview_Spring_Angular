@@ -80,15 +80,18 @@ class VectorStore:
             must.extend(extra_filters)
         flt = qm.Filter(must=must) if must else None
 
+        # qdrant-client >= 1.7: use query_points (replaces the removed .search())
         res = await asyncio.to_thread(
-            self._client.search,
+            self._client.query_points,
             collection_name=self.collection,
-            query_vector=vector,
+            query=vector,
             limit=top_k,
             query_filter=flt,
             with_payload=True,
         )
-        return [{"score": h.score, "payload": h.payload} for h in res]
+        # query_points returns a QueryResponse with a .points list of ScoredPoint
+        points = res.points if hasattr(res, "points") else res
+        return [{"score": h.score, "payload": h.payload} for h in points]
 
     async def delete_source(self, source_id: str) -> None:
         await asyncio.to_thread(

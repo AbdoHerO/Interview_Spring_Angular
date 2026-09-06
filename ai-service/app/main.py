@@ -7,7 +7,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from loguru import logger
 
-from app.api import routes_ingest, routes_interview
+from app.api import routes_ingest, routes_interview, routes_voice
 from app.config import get_settings
 
 
@@ -27,6 +27,7 @@ def create_app() -> FastAPI:
     )
     app.include_router(routes_ingest.router)
     app.include_router(routes_interview.router)
+    app.include_router(routes_voice.router)
 
     @app.get("/healthz")
     async def healthz():

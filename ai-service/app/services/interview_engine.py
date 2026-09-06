@@ -114,6 +114,11 @@ async def _next_question(state: InterviewState, last_answer: Optional[str]) -> s
     return text.strip().strip("`").strip()
 
 
+# Public alias used by the realtime voice gateway. Returns (system_prompt, history).
+async def build_voice_prompt(state: InterviewState):
+    return await _build_prompt(state, last_answer=None)
+
+
 async def _build_prompt(state: InterviewState, last_answer: Optional[str]):
     already = "; ".join(state.asked_questions[-8:]) or "(none yet)"
     topics = ", ".join(state.topics) or "general backend / Java / Spring"

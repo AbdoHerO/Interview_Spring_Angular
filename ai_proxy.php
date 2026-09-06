@@ -73,6 +73,8 @@ $routes = [
     'answer'              => ['POST', '/api/answer'],
     'interview-state'     => ['GET',  '/api/interview-state'],
     'score-interview'     => ['POST', '/api/score-interview'],
+    'voice-ticket'        => ['POST', '/api/voice/ticket'],
+    'voice-config'        => ['GET',  null],   // synthetic — answered locally below
 ];
 
 if (!isset($routes[$action])) {
@@ -82,6 +84,26 @@ if (!isset($routes[$action])) {
 [$expectedMethod, $path] = $routes[$action];
 if ($method !== $expectedMethod) {
     jexit(['error' => "method not allowed (expected $expectedMethod)"], 405);
+}
+
+// 'voice-config' is answered locally — it tells the browser where to open
+// the WebSocket directly. We deliberately do NOT proxy WS through PHP.
+if ($action === 'voice-config') {
+    // The browser opens this socket itself, so the URL must be one the browser
+    // can resolve. Under Docker, AI_SERVICE_URL is http://ai:8088 — a name that
+    // exists only inside the compose network — so deriving the WebSocket URL
+    // from it hands the browser ws://ai:8088, which fails before it connects.
+    // AI_PUBLIC_WS_URL is the public origin (wss://interview.zincolo.com),
+    // reverse-proxied to the AI service by Nginx for this one path.
+    $publicWs = trim((string)($_ENV['AI_PUBLIC_WS_URL'] ?? ''));
+    if ($publicWs !== '') {
+        jexit(['ws_url' => rtrim($publicWs, '/') . '/api/voice/ws']);
+    }
+
+    // Unset: local development, where AI_SERVICE_URL is already an address the
+    // browser can reach. Convert http(s)://host:port to ws(s)://host:port.
+    $ws = preg_replace('#^http#i', 'ws', $AI_BASE);
+    jexit(['ws_url' => $ws . '/api/voice/ws']);
 }
 
 // forward query string (e.g. session_id)

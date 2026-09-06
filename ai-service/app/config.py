@@ -24,6 +24,7 @@ class Settings(BaseSettings):
     openai_api_key: str = ""
     openai_model: str = "gpt-4.1"
     openai_base_url: str = "https://api.openai.com/v1"
+    openai_realtime_model: str = "gpt-realtime-2"
 
     anthropic_api_key: str = ""
     anthropic_model: str = "claude-sonnet-4-20250514"
