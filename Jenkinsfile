@@ -201,6 +201,26 @@ into this Jenkins folder and supplies its id; later runs reuse it.''')
                         sleep 3
                     done
                     echo "AI healthy after $((i * 3))s."
+
+                    # health.php proves PHP runs and the volume is writable. It
+                    # cannot prove Apache will actually serve the content, and a
+                    # too-broad deny rule once made every Concepts and Q&A page
+                    # return 403 while this gate stayed green. So fetch a real
+                    # content file, chosen from the checkout rather than
+                    # hardcoded, and require a 200.
+                    md=$(find files -name '*.md' | head -1)
+                    if [ -n "$md" ]; then
+                        # Spaces are the only character in these exported
+                        # filenames that curl will not send as-is.
+                        enc=$(printf '%s' "$md" | sed 's/ /%20/g')
+                        code=$(curl -o /dev/null -s -w '%{http_code}' \
+                            "http://127.0.0.1:${WEB_PORT}/${enc}" || echo 000)
+                        if [ "$code" != "200" ]; then
+                            echo "Content check failed: /${enc} returned ${code}, expected 200." >&2
+                            exit 1
+                        fi
+                        echo "Content check ok: /${enc}"
+                    fi
                 '''
             }
         }
